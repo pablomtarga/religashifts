@@ -38,9 +38,9 @@ header{padding:22px 2px 8px;display:flex;align-items:flex-end;justify-content:sp
 .empsel .chg{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--afternoon)}
 
 /* rail */
-.rail{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 12px;scroll-snap-type:x proximity;scrollbar-width:none}
+.rail{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .rail::-webkit-scrollbar{display:none}
-.pill{flex:0 0 auto;width:52px;scroll-snap-align:center;background:var(--surface);border:1px solid var(--line);
+.pill{flex:0 0 auto;width:52px;background:var(--surface);border:1px solid var(--line);
   border-radius:14px;padding:9px 0 8px;text-align:center;cursor:pointer;position:relative;transition:.15s}
 .pill:active{transform:scale(.95)}
 .pill .wd{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.05em}
@@ -49,6 +49,8 @@ header{padding:22px 2px 8px;display:flex;align-items:flex-end;justify-content:sp
 .pill.sel{background:var(--surface2);box-shadow:inset 0 0 0 1.5px currentColor}
 .pill.today .dn{color:#fff}
 .pill.today::after{content:"";position:absolute;top:6px;right:7px;width:5px;height:5px;border-radius:50%;background:var(--text)}
+@keyframes pulseToday{0%{box-shadow:0 0 0 0 rgba(255,255,255,.55)}100%{box-shadow:0 0 0 14px rgba(255,255,255,0)}}
+.pill.flash{animation:pulseToday .75s ease-out}
 
 /* tabs */
 .tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:4px;margin:2px 0 18px}
@@ -75,9 +77,12 @@ header{padding:22px 2px 8px;display:flex;align-items:flex-end;justify-content:sp
 .clock .ticks{display:flex;justify-content:space-between;margin-top:6px}
 .clock .ticks span{font-family:var(--mono);font-size:9.5px;color:var(--faint)}
 .rest{border-radius:22px;padding:30px 22px;border:1px solid var(--line);position:relative;overflow:hidden;background:var(--surface)}
-.rest .glow{position:absolute;inset:0;opacity:.14;background:radial-gradient(80% 120% at 20% 10%,var(--accent),transparent 60%)}
+.rest .glow{position:absolute;inset:0;opacity:.22;background:radial-gradient(80% 120% at 20% 10%,var(--accent),transparent 60%)}
+.rest.big{box-shadow:0 0 0 1px transparent, 0 10px 34px -18px var(--accent)}
 .rest .k{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);position:relative}
-.rest h2{font-family:var(--display);font-weight:700;font-size:30px;margin-top:8px;letter-spacing:-.02em;position:relative}
+.rest h2{font-family:var(--display);font-weight:700;font-size:30px;margin-top:8px;letter-spacing:-.02em;position:relative;color:var(--accent)}
+.daylabel{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:600;font-size:13.5px;color:var(--text);margin:20px 2px 11px;letter-spacing:-.01em}
+.daylabel span{font-family:var(--mono);font-weight:400;font-size:10.5px;color:var(--faint);background:var(--surface);border:1px solid var(--line);padding:3px 8px;border-radius:999px}
 .rest p{color:var(--muted);font-size:13.5px;margin-top:8px;position:relative;font-family:var(--mono)}
 .blocks{margin-top:16px;display:flex;flex-direction:column;gap:11px}
 .block{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
@@ -270,7 +275,19 @@ function markRail(){
   [...rail.children].forEach((el,i)=>el.classList.toggle('sel',i===cur));
 }
 function scrollPill(i){const rail=document.getElementById('rail');const p=rail.children[i];if(!p)return;
-  rail.scrollTo({left:p.offsetLeft-rail.clientWidth/2+p.clientWidth/2,behavior:'smooth'});}
+  const left=Math.max(0,p.offsetLeft-rail.clientWidth/2+p.clientWidth/2);
+  try{rail.scrollTo({left,behavior:'smooth'});}catch(e){rail.scrollLeft=left;}}
+function flashToday(){
+  const rail=document.getElementById('rail');const i=DAYS.findIndex(d=>d.date===todayISO());
+  if(i<0)return;const p=rail.children[i];if(!p)return;
+  p.classList.remove('flash');void p.offsetWidth;p.classList.add('flash');
+  setTimeout(()=>p.classList.remove('flash'),820);
+}
+function goToday(){
+  cur=idxForToday();tab='today';syncTabs();render();
+  scrollPill(cur);setTimeout(()=>{scrollPill(cur);flashToday();},60);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 function selectEmp(name){
   selEmp=name;DAYS=buildDays(selEmp);cur=idxForToday();
@@ -295,6 +312,18 @@ function groupsHTML(groups,mineLoc){
     return `<div class="floor"><div class="fl${mine}">${tag}</div><div class="nm">${names}</div></div>`;
   }).join('');
 }
+function dayWorkHTML(iso){
+  const pers=['Manhã','Tarde','Noite'];let blocks='';let total=0;
+  for(const per of pers){
+    const groups=workersOn(iso,per);
+    if(!groups.length)continue;
+    total+=groups.reduce((a,g)=>a+g.people.length,0);
+    const std=PADRAO[per];
+    blocks+=`<div class="block"><div class="lab"><span class="ic" style="background:${PCOL[per]}"></span><span class="t">${per}</span><span class="s">${std[0]}–${std[1]}</span></div>${groupsHTML(groups,null)}</div>`;
+  }
+  if(!total)return `<div class="daylabel">Ninguém escalado neste dia.</div>`;
+  return `<div class="daylabel">Quem trabalha neste dia <span>${total} pessoa${total>1?'s':''}</span></div><div class="blocks">${blocks}</div>`;
+}
 
 function renderToday(){
   const d=DAYS[cur];const v=document.getElementById('viewToday');const acc=accentFor(d);const isToday=d.date===todayISO();
@@ -317,8 +346,9 @@ function renderToday(){
     html+=`</div>`;
   } else {
     const k=d.status==='vac'?'Férias':d.status==='off'?'Folga':'Sem turno';
-    const msg=d.status==='vac'?'Dia de férias. Sem turno.':d.status==='off'?'Dia livre. Sem turno escalado.':'Nenhum turno definido na escala.';
-    html+=`<section class="rest" style="--accent:${acc}"><div class="glow"></div><span class="k">${d.wdFull} · ${d.dd}${isToday?' · hoje':''}</span><h2>${k}</h2><p>${msg}</p></section>`;
+    const msg=d.status==='vac'?'Você está de férias. Veja quem cobre o dia.':d.status==='off'?'Dia livre pra você. Veja quem trabalha hoje.':'Nenhum turno definido na escala.';
+    html+=`<section class="rest big" style="--accent:${acc};border-color:${acc}66"><div class="glow"></div><span class="k">${d.wdFull} · ${d.dd}${isToday?' · hoje':''}</span><h2>${k}</h2><p>${msg}</p></section>`;
+    if(d.status==='off'||d.status==='vac') html+=dayWorkHTML(d.date);
   }
   html+=`<div class="nav"><button id="prev" ${cur===0?'disabled':''}>‹ Anterior</button><button id="next" ${cur===DAYS.length-1?'disabled':''}>Próximo ›</button></div>`;
   v.innerHTML=html;
@@ -415,7 +445,7 @@ function render(){
 }
 
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{tab=t.dataset.tab;syncTabs();render();});
-document.getElementById('todayBtn').onclick=()=>{cur=idxForToday();tab='today';syncTabs();render();scrollPill(cur);window.scrollTo({top:0,behavior:'smooth'});};
+document.getElementById('todayBtn').onclick=goToday;
 document.getElementById('empBtn').onclick=openOv;
 document.getElementById('closeOv').onclick=closeOv;
 document.getElementById('ov').onclick=(e)=>{if(e.target.id==='ov')closeOv();};
