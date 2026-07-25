@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Meu Turno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1017; --surface:#161b24; --surface2:#1d2530; --line:#28303d;
+  --text:#e9ecf1; --muted:#7f8a9b; --faint:#576273;
+  --morning:#f5a623; --afternoon:#3f8bf6; --night:#9b6cf6;
+  --off:#28c76f; --vac:#f472b6; --alert:#ff5d5d;
+  --display:'Space Grotesk',sans-serif; --mono:'JetBrains Mono',monospace; --body:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:var(--body)}
+body{
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(155,108,246,.10), transparent 60%),
+    radial-gradient(90% 50% at 100% 0%, rgba(63,139,246,.06), transparent 55%),
+    var(--bg);
+  min-height:100vh;
+}
+.app{max-width:480px;margin:0 auto;padding:0 16px calc(28px + env(safe-area-inset-bottom))}
+header{padding:22px 2px 12px;display:flex;align-items:flex-end;justify-content:space-between}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;color:var(--faint);text-transform:uppercase}
+.brand h1{font-family:var(--display);font-weight:700;font-size:25px;letter-spacing:-.02em;line-height:1}
+.today-btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--muted);background:var(--surface);
+  border:1px solid var(--line);padding:9px 13px;border-radius:11px;cursor:pointer;transition:.15s}
+.today-btn:active{transform:scale(.96)} .today-btn.on{color:var(--text);border-color:#3a4557}
+
+/* rail */
+.rail{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 12px;scroll-snap-type:x proximity;-ms-overflow-style:none;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.pill{flex:0 0 auto;width:52px;scroll-snap-align:center;background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;padding:9px 0 8px;text-align:center;cursor:pointer;position:relative;transition:.15s;overflow:hidden}
+.pill:active{transform:scale(.95)}
+.pill .wd{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.05em}
+.pill .dn{font-family:var(--display);font-weight:600;font-size:18px;margin-top:2px;line-height:1}
+.pill .dot{height:4px;border-radius:3px;margin:7px 9px 0;background:var(--faint)}
+.pill.sel{border-color:transparent;background:var(--surface2);box-shadow:inset 0 0 0 1.5px currentColor}
+.pill.today .dn{color:#fff}
+.pill.today::after{content:"";position:absolute;top:6px;right:7px;width:5px;height:5px;border-radius:50%;background:var(--text)}
+
+/* tabs */
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:4px;margin:2px 0 18px}
+.tab{flex:1;text-align:center;font-family:var(--display);font-weight:600;font-size:13.5px;color:var(--muted);
+  padding:9px;border-radius:9px;cursor:pointer;transition:.15s}
+.tab.on{background:var(--surface2);color:var(--text)}
+
+/* hero */
+.hero{border-radius:22px;padding:20px 20px 22px;border:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden}
+.hero .glow{position:absolute;inset:0;opacity:.16;background:radial-gradient(90% 130% at 15% 0%,var(--accent),transparent 60%);pointer-events:none}
+.hero .datel{display:flex;align-items:baseline;gap:9px;position:relative}
+.hero .datel .big{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.01em}
+.hero .datel .sub{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tagrow{display:flex;align-items:center;gap:9px;margin-top:16px;position:relative;flex-wrap:wrap}
+.badge{font-family:var(--display);font-weight:700;font-size:15px;padding:6px 13px;border-radius:999px;color:#0c0f15;letter-spacing:.01em}
+.loc{font-family:var(--mono);font-size:13px;color:var(--text);background:var(--surface2);border:1px solid var(--line);padding:6px 11px;border-radius:999px}
+.time{font-family:var(--mono);font-size:15px;color:var(--muted);margin-left:auto}
+.time b{color:var(--text);font-weight:500}
+
+/* 24h bar */
+.clock{margin-top:20px;position:relative}
+.clock .track{height:34px;border-radius:9px;background:linear-gradient(var(--surface2),var(--surface2));border:1px solid var(--line);position:relative;overflow:hidden}
+.clock .seg{position:absolute;top:0;bottom:0;background:var(--accent);opacity:.9}
+.clock .seg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 55%)}
+.clock .now{position:absolute;top:-3px;bottom:-3px;width:2px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.8);z-index:3}
+.clock .now::after{content:"agora";position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:8.5px;color:#fff;letter-spacing:.05em}
+.clock .ticks{display:flex;justify-content:space-between;margin-top:6px}
+.clock .ticks span{font-family:var(--mono);font-size:9.5px;color:var(--faint)}
+
+/* rest day hero */
+.rest{border-radius:22px;padding:30px 22px;border:1px solid var(--line);position:relative;overflow:hidden;text-align:left}
+.rest .glow{position:absolute;inset:0;opacity:.14;background:radial-gradient(80% 120% at 20% 10%,var(--accent),transparent 60%)}
+.rest .k{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);position:relative}
+.rest h2{font-family:var(--display);font-weight:700;font-size:30px;margin-top:8px;letter-spacing:-.02em;position:relative}
+.rest p{color:var(--muted);font-size:13.5px;margin-top:8px;position:relative;font-family:var(--mono)}
+
+/* context blocks */
+.blocks{margin-top:16px;display:flex;flex-direction:column;gap:11px}
+.block{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
+.block .lab{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.block .lab .t{font-family:var(--display);font-weight:600;font-size:14px}
+.block .lab .s{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.block .lab .ic{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.floor{display:flex;gap:9px;padding:6px 0;border-top:1px solid var(--line)}
+.floor:first-of-type{border-top:none}
+.floor .fl{font-family:var(--mono);font-size:11px;color:var(--muted);flex:0 0 66px;padding-top:1px}
+.floor .fl.mine{color:var(--off);font-weight:700}
+.floor .nm{font-size:13.5px;line-height:1.5;color:var(--text)}
+.floor .nm .ot{font-family:var(--mono);font-size:10.5px;color:var(--vac);margin-left:3px}
+.empty{color:var(--faint);font-size:13px;font-style:italic}
+
+/* desk4 alert */
+.d4{border-radius:14px;padding:12px 14px;font-size:13.5px;display:flex;align-items:center;gap:10px;margin-top:2px}
+.d4 .dt{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.d4.bad{background:rgba(255,93,93,.09);border:1px solid rgba(255,93,93,.35)}
+.d4.bad .dt{background:var(--alert)} .d4.bad b{color:var(--alert)}
+.d4.ok{background:rgba(63,139,246,.08);border:1px solid rgba(63,139,246,.3)}
+.d4.ok .dt{background:var(--afternoon)} .d4.ok b{color:var(--afternoon)}
+.d4 .mono{font-family:var(--mono);font-size:12px}
+
+/* agenda */
+.week{margin-bottom:16px}
+.week .wh{display:flex;justify-content:space-between;align-items:center;padding:0 4px 8px}
+.week .wh .r{font-family:var(--display);font-weight:700;font-size:14px}
+.week .wh .c{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.arow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:11px 13px;margin-bottom:6px;cursor:pointer;transition:.12s}
+.arow:active{transform:scale(.99)}
+.arow .day{font-family:var(--mono);font-size:12px;color:var(--muted);flex:0 0 52px}
+.arow .day b{color:var(--text);font-weight:500}
+.arow .bar{width:3px;align-self:stretch;border-radius:3px;flex:0 0 3px}
+.arow .txt{font-family:var(--display);font-weight:600;font-size:13.5px}
+.arow .rt{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.foot{text-align:center;color:var(--faint);font-family:var(--mono);font-size:10.5px;line-height:1.7;margin-top:22px;padding:0 10px}
+.nav{display:flex;gap:8px;margin:16px 0 4px}
+.nav button{flex:1;background:var(--surface);border:1px solid var(--line);color:var(--text);
+  font-family:var(--display);font-weight:600;font-size:14px;padding:12px;border-radius:13px;cursor:pointer;transition:.15s}
+.nav button:active{transform:scale(.97)}
+.nav button:disabled{opacity:.3}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><span class="kicker">Escala · Malta</span><h1>Meu Turno</h1></div>
+    <button class="today-btn" id="todayBtn">Hoje</button>
+  </header>
+  <div class="rail" id="rail"></div>
+  <nav class="tabs">
+    <div class="tab on" data-tab="today">Hoje</div>
+    <div class="tab" data-tab="agenda">Agenda</div>
+  </nav>
+  <main id="viewToday"></main>
+  <main id="viewAgenda" hidden></main>
+</div>
+
+<script>
+const DATA = {"meta": {"start": "2026-07-25", "end": "2026-08-31", "name": "Pablo Targa"}, "days": [{"date": "2026-07-25", "wd": "Sáb", "wdFull": "Sábado", "dd": "25/07", "status": "work", "shift": {"per": "Tarde", "ini": "15:00", "fim": "23:00", "loc": "Desk -5"}, "before": {"turno": "Manhã", "say": "saem 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Deyan", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Slots", "people": [{"n": "Dzuliano", "ot": null}]}]}, "after": {"turno": "Noite", "say": "entram 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Chandan Sing Pela", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Salman Shaikh", "ot": null}]}]}, "desk4": {"state": "uncovered", "people": []}}, {"date": "2026-07-26", "wd": "Dom", "wdFull": "Domingo", "dd": "26/07", "status": "work", "shift": {"per": "Tarde", "ini": "15:00", "fim": "23:00", "loc": "Bugibba"}, "before": {"turno": "Manhã", "say": "saem 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Gatis Sipols", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Lucas Rodriguez", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Camila Andrade", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Daniel", "ot": null}]}]}, "after": {"turno": "Noite", "say": "entram 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "desk4": null}, {"date": "2026-07-27", "wd": "Seg", "wdFull": "Segunda", "dd": "27/07", "status": "work", "shift": {"per": "Noite", "ini": "23:00", "fim": "07:00", "loc": "Bugibba"}, "before": {"turno": "Tarde", "say": "saem 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Camila Andrade", "ot": null}]}, {"loc": "Desk -4", "people": [{"n": "Deyan", "ot": null}, {"n": "Kendrick", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Salman Shaikh", "ot": null}]}, {"loc": "Slots", "people": [{"n": "Daniel", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Shaun", "ot": null}]}]}, "after": {"turno": "Manhã", "say": "entram 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Dzuliano", "ot": null}]}]}, "desk4": null}, {"date": "2026-07-28", "wd": "Ter", "wdFull": "Terça", "dd": "28/07", "status": "work", "shift": {"per": "Noite", "ini": "23:00", "fim": "07:00", "loc": "Bugibba"}, "before": {"turno": "Tarde", "say": "saem 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Camila Andrade", "ot": null}]}, {"loc": "Desk -4", "people": [{"n": "Deyan", "ot": null}, {"n": "Kendrick", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Salman Shaikh", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Gatis Sipols", "ot": null}]}]}, "after": {"turno": "Manhã", "say": "entram 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Dzuliano", "ot": null}]}]}, "desk4": null}, {"date": "2026-07-29", "wd": "Qua", "wdFull": "Quarta", "dd": "29/07", "status": "off"}, {"date": "2026-07-30", "wd": "Qui", "wdFull": "Quinta", "dd": "30/07", "status": "off"}, {"date": "2026-07-31", "wd": "Sex", "wdFull": "Sexta", "dd": "31/07", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Gatis Sipols", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}, {"n": "Joao Vitor", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Slots", "people": [{"n": "Dzuliano", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-01", "wd": "Sáb", "wdFull": "Sábado", "dd": "01/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Gatis Sipols", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Camila Andrade", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Joao Vitor", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Lucas Rodriguez", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-02", "wd": "Dom", "wdFull": "Domingo", "dd": "02/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Camila Andrade", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Lucas Rodriguez", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-03", "wd": "Seg", "wdFull": "Segunda", "dd": "03/08", "status": "work", "shift": {"per": "Tarde", "ini": "15:00", "fim": "23:00", "loc": "Desk -1"}, "before": {"turno": "Manhã", "say": "saem 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Kendrick", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -5", "people": [{"n": "Camila Andrade", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Gatis Sipols", "ot": null}]}]}, "after": {"turno": "Noite", "say": "entram 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Daniel", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-04", "wd": "Ter", "wdFull": "Terça", "dd": "04/08", "status": "off"}, {"date": "2026-08-05", "wd": "Qua", "wdFull": "Quarta", "dd": "05/08", "status": "off"}, {"date": "2026-08-06", "wd": "Qui", "wdFull": "Quinta", "dd": "06/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}, {"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Gatis Sipols", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-07", "wd": "Sex", "wdFull": "Sexta", "dd": "07/08", "status": "work", "shift": {"per": "Tarde", "ini": "15:00", "fim": "23:00", "loc": "Bugibba"}, "before": {"turno": "Manhã", "say": "saem 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Kendrick", "ot": null}, {"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Camila Andrade", "ot": null}, {"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Lucas Rodriguez", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Deyan", "ot": null}]}]}, "after": {"turno": "Noite", "say": "entram 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-08", "wd": "Sáb", "wdFull": "Sábado", "dd": "08/08", "status": "work", "shift": {"per": "Tarde", "ini": "15:00", "fim": "23:00", "loc": "Bugibba"}, "before": {"turno": "Manhã", "say": "saem 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}]}, "after": {"turno": "Noite", "say": "entram 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-09", "wd": "Dom", "wdFull": "Domingo", "dd": "09/08", "status": "work", "shift": {"per": "Tarde", "ini": "15:00", "fim": "23:00", "loc": "Bugibba"}, "before": {"turno": "Manhã", "say": "saem 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}, {"n": "Lokendra", "ot": null}]}, {"loc": "Desk -4", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Deyan", "ot": null}]}]}, "after": {"turno": "Noite", "say": "entram 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Gatis Sipols", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Lucas Rodriguez", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-10", "wd": "Seg", "wdFull": "Segunda", "dd": "10/08", "status": "off"}, {"date": "2026-08-11", "wd": "Ter", "wdFull": "Terça", "dd": "11/08", "status": "off"}, {"date": "2026-08-12", "wd": "Qua", "wdFull": "Quarta", "dd": "12/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Gatis Sipols", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}, {"n": "Shaun", "ot": null}]}, {"loc": "Desk -4", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Joao Vitor", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-13", "wd": "Qui", "wdFull": "Quinta", "dd": "13/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Gatis Sipols", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Shaun", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-14", "wd": "Sex", "wdFull": "Sexta", "dd": "14/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Camila Andrade", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Shaun", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-15", "wd": "Sáb", "wdFull": "Sábado", "dd": "15/08", "status": "work", "shift": {"per": "Tarde", "ini": "15:00", "fim": "23:00", "loc": "Bugibba"}, "before": {"turno": "Manhã", "say": "saem 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}]}, "after": {"turno": "Noite", "say": "entram 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-16", "wd": "Dom", "wdFull": "Domingo", "dd": "16/08", "status": "work", "shift": {"per": "Tarde", "ini": "15:00", "fim": "23:00", "loc": "Bugibba"}, "before": {"turno": "Manhã", "say": "saem 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Kendrick", "ot": null}]}]}, "after": {"turno": "Noite", "say": "entram 23:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Deyan", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-17", "wd": "Seg", "wdFull": "Segunda", "dd": "17/08", "status": "off"}, {"date": "2026-08-18", "wd": "Ter", "wdFull": "Terça", "dd": "18/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Maxine", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Shaun", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}, {"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-19", "wd": "Qua", "wdFull": "Quarta", "dd": "19/08", "status": "vac"}, {"date": "2026-08-20", "wd": "Qui", "wdFull": "Quinta", "dd": "20/08", "status": "vac"}, {"date": "2026-08-21", "wd": "Sex", "wdFull": "Sexta", "dd": "21/08", "status": "vac"}, {"date": "2026-08-22", "wd": "Sáb", "wdFull": "Sábado", "dd": "22/08", "status": "vac"}, {"date": "2026-08-23", "wd": "Dom", "wdFull": "Domingo", "dd": "23/08", "status": "off"}, {"date": "2026-08-24", "wd": "Seg", "wdFull": "Segunda", "dd": "24/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Salman Shaikh", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}, {"n": "Shaun", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Desk -4", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Chandan Sing Pela", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-25", "wd": "Ter", "wdFull": "Terça", "dd": "25/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Salman Shaikh", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Maxine", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}, {"n": "Shaun", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Daniel", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-26", "wd": "Qua", "wdFull": "Quarta", "dd": "26/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Chandan Sing Pela", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Joao Vitor", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Maxine", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Lokendra", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Hilfran Marquez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-27", "wd": "Qui", "wdFull": "Quinta", "dd": "27/08", "status": "work", "shift": {"per": "Manhã", "ini": "07:00", "fim": "15:00", "loc": "Bugibba"}, "before": {"turno": "Noite", "say": "saem 07:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Chandan Sing Pela", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Lucas Rodriguez", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Maxine", "ot": null}]}]}, "same": {"groups": [{"loc": "Desk -1", "people": [{"n": "Salman Shaikh", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Andreas Vasileiadis", "ot": null}]}]}, "after": {"turno": "Tarde", "say": "entram 15:00", "groups": [{"loc": "Desk -1", "people": [{"n": "Shaun", "ot": null}]}, {"loc": "Desk -5", "people": [{"n": "Dzuliano", "ot": null}]}, {"loc": "Bugibba", "people": [{"n": "Camila Andrade", "ot": null}]}]}, "desk4": null}, {"date": "2026-08-28", "wd": "Sex", "wdFull": "Sexta", "dd": "28/08", "status": "vac"}, {"date": "2026-08-29", "wd": "Sáb", "wdFull": "Sábado", "dd": "29/08", "status": "off"}, {"date": "2026-08-30", "wd": "Dom", "wdFull": "Domingo", "dd": "30/08", "status": "off"}, {"date": "2026-08-31", "wd": "Seg", "wdFull": "Segunda", "dd": "31/08", "status": "vac"}]};
+const DAYS = DATA.days;
+const PCOL = {'Manhã':'var(--morning)','Tarde':'var(--afternoon)','Noite':'var(--night)'};
+const PHEX = {'Manhã':'#f5a623','Tarde':'#3f8bf6','Noite':'#9b6cf6'};
+const STCOL = {work:null, off:'var(--off)', vac:'var(--vac)', none:'var(--faint)'};
+
+function todayISO(){const d=new Date();const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+function idxForToday(){
+  const t=todayISO();
+  let i=DAYS.findIndex(d=>d.date===t);
+  if(i>=0) return i;
+  if(t < DAYS[0].date) return 0;
+  return DAYS.length-1;
+}
+let cur = idxForToday();
+let tab = 'today';
+
+function accentFor(d){
+  if(d.status==='work') return PHEX[d.shift.per];
+  if(d.status==='off') return '#28c76f';
+  if(d.status==='vac') return '#f472b6';
+  return '#576273';
+}
+
+/* ---- rail ---- */
+function buildRail(){
+  const rail=document.getElementById('rail'); rail.innerHTML='';
+  const t=todayISO();
+  DAYS.forEach((d,i)=>{
+    const el=document.createElement('div');
+    el.className='pill'+(i===cur?' sel':'')+(d.date===t?' today':'');
+    el.style.color=accentFor(d);
+    el.innerHTML=`<div class="wd">${d.wd}</div><div class="dn">${d.date.slice(8)}</div>
+      <div class="dot" style="background:${accentFor(d)}"></div>`;
+    el.onclick=()=>{cur=i;tab='today';syncTabs();render();scrollPill(i);};
+    rail.appendChild(el);
+  });
+}
+function scrollPill(i){
+  const rail=document.getElementById('rail');
+  const pill=rail.children[i]; if(!pill)return;
+  rail.scrollTo({left:pill.offsetLeft-rail.clientWidth/2+pill.clientWidth/2,behavior:'smooth'});
+}
+
+/* ---- 24h clock ---- */
+function hToNum(hhmm){const [h,m]=hhmm.split(':').map(Number);return h+m/60;}
+function clockHTML(shift,isToday){
+  const a=hToNum(shift.ini), b=hToNum(shift.fim);
+  let segs=[];
+  if(b>a){segs.push([a,b]);} else {segs.push([a,24]);segs.push([0,b]);}
+  let inner=segs.map(([s,e])=>`<div class="seg" style="left:${s/24*100}%;width:${(e-s)/24*100}%"></div>`).join('');
+  if(isToday){const now=new Date();const h=now.getHours()+now.getMinutes()/60;inner+=`<div class="now" style="left:${h/24*100}%"></div>`;}
+  return `<div class="clock"><div class="track">${inner}</div>
+    <div class="ticks"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></div>`;
+}
+
+/* ---- floor groups ---- */
+function groupsHTML(groups,mineLoc){
+  if(!groups||!groups.length) return `<div class="empty">ninguém escalado</div>`;
+  return groups.map(g=>{
+    const names=g.people.map(p=>p.n+(p.ot?`<span class="ot">${p.ot}</span>`:'')).join(', ');
+    const mine=g.loc===mineLoc?' mine':'';
+    const tag=g.loc===mineLoc?g.loc+' ★':g.loc;
+    return `<div class="floor"><div class="fl${mine}">${tag}</div><div class="nm">${names}</div></div>`;
+  }).join('');
+}
+
+/* ---- today view ---- */
+function renderToday(){
+  const d=DAYS[cur]; const v=document.getElementById('viewToday');
+  const acc=accentFor(d); const isToday=d.date===todayISO();
+  let html='';
+  if(d.status==='work'){
+    const s=d.shift;
+    html+=`<section class="hero" style="--accent:${acc}"><div class="glow"></div>
+      <div class="datel"><span class="big">${d.wdFull}</span><span class="sub">${d.dd}${isToday?' · hoje':''}</span></div>
+      <div class="tagrow">
+        <span class="badge" style="background:${acc}">${s.per}</span>
+        <span class="loc">${s.loc}</span>
+        <span class="time"><b>${s.ini}</b>–<b>${s.fim}</b></span>
+      </div>
+      ${clockHTML(s,isToday)}
+    </section>`;
+
+    // desk4 alert (right under hero when at -5)
+    if(d.desk4){
+      if(d.desk4.state==='uncovered'){
+        html+=`<div class="d4 bad"><span class="dt"></span><div><b>Desk -4 sem cobertura</b> <span class="mono">no seu horário</span></div></div>`;
+      }else{
+        html+=`<div class="d4 ok"><span class="dt"></span><div><b>Desk -4 coberto:</b> ${d.desk4.people.join(', ')} <span class="mono">no seu horário</span></div></div>`;
+      }
+    }
+
+    html+=`<div class="blocks">
+      <div class="block">
+        <div class="lab"><span class="ic" style="background:${PCOL[d.before.turno]}"></span><span class="t">Passa pra você</span><span class="s">${d.before.turno} · ${d.before.say}</span></div>
+        ${groupsHTML(d.before.groups,s.loc)}
+      </div>
+      <div class="block">
+        <div class="lab"><span class="ic" style="background:${acc}"></span><span class="t">No mesmo horário</span><span class="s">outros pisos</span></div>
+        ${groupsHTML(d.same.groups,null)}
+      </div>
+      <div class="block">
+        <div class="lab"><span class="ic" style="background:${PCOL[d.after.turno]}"></span><span class="t">Você passa pra</span><span class="s">${d.after.turno} · ${d.after.say}</span></div>
+        ${groupsHTML(d.after.groups,s.loc)}
+      </div>
+    </div>`;
+  } else {
+    const k = d.status==='vac' ? 'Férias' : d.status==='off' ? 'Folga' : 'Sem turno';
+    const msg = d.status==='vac' ? 'Aproveite. Nada de handover hoje.'
+              : d.status==='off' ? 'Dia livre. Sem turno escalado.'
+              : 'Nenhum turno definido na escala.';
+    html+=`<section class="rest" style="--accent:${acc};background:var(--surface)"><div class="glow"></div>
+      <span class="k">${d.wdFull} · ${d.dd}${isToday?' · hoje':''}</span>
+      <h2>${k}</h2><p>${msg}</p></section>`;
+  }
+  html+=`<div class="nav">
+    <button id="prev" ${cur===0?'disabled':''}>‹ Anterior</button>
+    <button id="next" ${cur===DAYS.length-1?'disabled':''}>Próximo ›</button>
+  </div>`;
+  v.innerHTML=html;
+  const pv=document.getElementById('prev'), nx=document.getElementById('next');
+  if(pv) pv.onclick=()=>{if(cur>0){cur--;render();scrollPill(cur);}};
+  if(nx) nx.onclick=()=>{if(cur<DAYS.length-1){cur++;render();scrollPill(cur);}};
+}
+
+/* ---- agenda view ---- */
+function renderAgenda(){
+  const v=document.getElementById('viewAgenda');
+  // split into weeks Mon-Sun
+  let weeks=[],w=[];
+  DAYS.forEach(d=>{
+    const wd=new Date(d.date+'T00:00').getDay(); // 0 Sun..6 Sat
+    if(w.length && wd===1){weeks.push(w);w=[];}
+    w.push(d);
+  });
+  if(w.length)weeks.push(w);
+  const t=todayISO();
+  let html='';
+  weeks.forEach(wk=>{
+    const nw=wk.filter(x=>x.status==='work').length;
+    const no=wk.filter(x=>x.status==='off').length;
+    const nv=wk.filter(x=>x.status==='vac').length;
+    const c=`${nw} trab · ${no} folga`+(nv?` · ${nv} fér`:'');
+    html+=`<div class="week"><div class="wh"><span class="r">${wk[0].dd} a ${wk[wk.length-1].dd}</span><span class="c">${c}</span></div>`;
+    wk.forEach(d=>{
+      const acc=accentFor(d);
+      const gi=DAYS.indexOf(d);
+      let txt,rt='';
+      if(d.status==='work'){txt=d.shift.per;rt=`${d.shift.loc} · ${d.shift.ini}–${d.shift.fim}`;}
+      else if(d.status==='off'){txt='Folga';}
+      else if(d.status==='vac'){txt='Férias';}
+      else{txt='Sem turno';}
+      html+=`<div class="arow" data-i="${gi}">
+        <span class="day">${d.wd} <b>${d.date.slice(8)}</b></span>
+        <span class="bar" style="background:${acc}"></span>
+        <span class="txt" style="color:${d.status==='work'?acc:'var(--text)'}">${txt}</span>
+        <span class="rt">${rt}</span></div>`;
+    });
+    html+='</div>';
+  });
+  html+=`<div class="foot">Pisos: Desk -1, -4, -5, Bugibba, Slots · ★ = seu posto (handover direto)<br>
+    horário em rosa = OT/turno estendido · escala de ${DATA.meta.start.split('-').reverse().join('/')} a ${DATA.meta.end.split('-').reverse().join('/')}</div>`;
+  v.innerHTML=html;
+  v.querySelectorAll('.arow').forEach(el=>{
+    el.onclick=()=>{cur=parseInt(el.dataset.i);tab='today';syncTabs();render();scrollPill(cur);window.scrollTo({top:0,behavior:'smooth'});};
+  });
+}
+
+/* ---- tabs / render ---- */
+function syncTabs(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  document.getElementById('viewToday').hidden = tab!=='today';
+  document.getElementById('viewAgenda').hidden = tab!=='agenda';
+}
+function render(){
+  buildRail();
+  if(tab==='today') renderToday(); else renderAgenda();
+  const tb=document.getElementById('todayBtn');
+  tb.classList.toggle('on', DAYS[cur] && DAYS[cur].date===todayISO());
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{tab=t.dataset.tab;syncTabs();render();});
+document.getElementById('todayBtn').onclick=()=>{cur=idxForToday();tab='today';syncTabs();render();scrollPill(cur);window.scrollTo({top:0,behavior:'smooth'});};
+
+syncTabs();
+render();
+setTimeout(()=>scrollPill(cur),120);
+</script>
+</body>
+</html>
