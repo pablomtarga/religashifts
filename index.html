@@ -29,15 +29,13 @@ header{padding:22px 2px 8px;display:flex;align-items:flex-end;justify-content:sp
 .today-btn:active{transform:scale(.96)} .today-btn.on{color:var(--text);border-color:#3a4557}
 
 /* employee selector */
-.emplabel{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);padding:2px 2px 7px}
-.emprail{display:flex;gap:7px;overflow-x:auto;padding:0 2px 14px;scrollbar-width:none}
-.emprail::-webkit-scrollbar{display:none}
-.echip{flex:0 0 auto;font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);background:var(--surface);
-  border:1px solid var(--line);padding:8px 13px;border-radius:999px;cursor:pointer;transition:.13s;white-space:nowrap}
-.echip:active{transform:scale(.95)}
-.echip.on{color:#0c0f15;border-color:transparent}
-.echip.find{display:flex;align-items:center;gap:6px;color:var(--afternoon)}
-.echip.find svg{stroke:var(--afternoon)}
+.empsel{width:100%;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
+  border-radius:13px;padding:11px 13px;margin:6px 0 14px;cursor:pointer;transition:.15s}
+.empsel:active{transform:scale(.99)}
+.empsel svg{flex:0 0 auto;stroke:var(--muted)}
+.empsel .who{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:-.01em}
+.empsel .who small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;margin-bottom:1px}
+.empsel .chg{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--afternoon)}
 
 /* rail */
 .rail{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 12px;scroll-snap-type:x proximity;scrollbar-width:none}
@@ -155,8 +153,11 @@ header{padding:22px 2px 8px;display:flex;align-items:flex-end;justify-content:sp
     <div class="brand"><span class="kicker">Escala · Malta</span><h1>Meu Turno</h1></div>
     <button class="today-btn" id="todayBtn">Hoje</button>
   </header>
-  <div class="emplabel">Funcionário</div>
-  <div class="emprail" id="emprail"></div>
+  <button class="empsel" id="empBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <span class="who"><small>Funcionário</small><span id="whoName">Pablo Targa</span></span>
+    <span class="chg">trocar</span>
+  </button>
   <div class="rail" id="rail"></div>
   <nav class="tabs">
     <div class="tab on" data-tab="today">Hoje</div>
@@ -271,27 +272,10 @@ function markRail(){
 function scrollPill(i){const rail=document.getElementById('rail');const p=rail.children[i];if(!p)return;
   rail.scrollTo({left:p.offsetLeft-rail.clientWidth/2+p.clientWidth/2,behavior:'smooth'});}
 
-/* barra de funcionarios */
-function buildEmpRail(){
-  const er=document.getElementById('emprail');er.innerHTML='';
-  const find=document.createElement('div');find.className='echip find';
-  find.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>Buscar';
-  find.onclick=openOv;er.appendChild(find);
-  EMPLOYEES.forEach(name=>{
-    const el=document.createElement('div');
-    el.className='echip'+(name===selEmp?' on':'');
-    if(name===selEmp)el.style.background='var(--afternoon)';
-    el.textContent=name;
-    el.onclick=()=>selectEmp(name);
-    er.appendChild(el);
-  });
-  // rola o selecionado à vista
-  const sel=er.querySelector('.echip.on');
-  if(sel)er.scrollTo({left:sel.offsetLeft-er.clientWidth/2+sel.clientWidth/2,behavior:'smooth'});
-}
 function selectEmp(name){
   selEmp=name;DAYS=buildDays(selEmp);cur=idxForToday();
-  buildEmpRail();buildRail();closeOv();tab='today';syncTabs();render();
+  document.getElementById('whoName').textContent=selEmp;
+  buildRail();closeOv();tab='today';syncTabs();render();
   setTimeout(()=>scrollPill(cur),100);
 }
 
@@ -432,12 +416,14 @@ function render(){
 
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{tab=t.dataset.tab;syncTabs();render();});
 document.getElementById('todayBtn').onclick=()=>{cur=idxForToday();tab='today';syncTabs();render();scrollPill(cur);window.scrollTo({top:0,behavior:'smooth'});};
+document.getElementById('empBtn').onclick=openOv;
 document.getElementById('closeOv').onclick=closeOv;
 document.getElementById('ov').onclick=(e)=>{if(e.target.id==='ov')closeOv();};
 document.getElementById('q').oninput=(e)=>renderList(e.target.value);
 
 cur=idxForToday();
-buildEmpRail();buildRail();
+document.getElementById('whoName').textContent=selEmp;
+buildRail();
 syncTabs();render();setTimeout(()=>scrollPill(cur),120);
 </script>
 </body>
