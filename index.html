@@ -36,10 +36,11 @@ header{padding:22px 2px 8px;display:flex;align-items:flex-start;justify-content:
 .iconbtn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--surface);
   border:1px solid var(--line);border-radius:11px;cursor:pointer;transition:.15s;color:var(--muted);padding:0}
 .iconbtn:active{transform:scale(.94)} .iconbtn svg{stroke:currentColor}
-.langbtn{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;color:var(--text);min-width:38px}
+.langbtn{font-size:19px;line-height:1;padding:0}
 .langmenu{position:fixed;z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:12px;
   padding:5px;box-shadow:0 14px 40px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:2px}
-.langmenu div{font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);padding:9px 16px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.langmenu div{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);padding:9px 15px 9px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.langmenu div .fl{font-size:17px;line-height:1}
 .langmenu div.on{background:var(--surface2);color:var(--text)}
 .langmenu div:active{background:var(--surface2)}
 .today-btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--muted);background:var(--surface);
@@ -48,11 +49,12 @@ header{padding:22px 2px 8px;display:flex;align-items:flex-start;justify-content:
 
 /* employee selector */
 .empsel{width:100%;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
-  border-radius:13px;padding:11px 13px;margin:6px 0 14px;cursor:pointer;transition:.15s}
+  border-radius:13px;padding:11px 13px;margin:6px 0 14px;cursor:pointer;transition:.15s;color:var(--text)}
 .empsel:active{transform:scale(.99)}
 .empsel svg{flex:0 0 auto;stroke:var(--muted)}
-.empsel .who{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:-.01em}
+.empsel .who{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:-.01em;color:var(--text)}
 .empsel .who small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;margin-bottom:1px}
+.empsel .who #whoName{color:var(--afternoon);font-weight:700}
 .empsel .chg{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--afternoon)}
 
 /* rail */
@@ -182,7 +184,7 @@ header{padding:22px 2px 8px;display:flex;align-items:flex-start;justify-content:
     <div class="brand"><span class="kicker" id="kicker">Escala · Malta</span><h1 id="appTitle">Meu Turno</h1></div>
     <div class="hactions">
       <button class="iconbtn" id="themeBtn" aria-label="tema"></button>
-      <button class="iconbtn langbtn" id="langBtn">PT</button>
+      <button class="iconbtn langbtn" id="langBtn">🇬🇧</button>
       <button class="today-btn" id="todayBtn">Hoje</button>
     </div>
   </header>
@@ -268,8 +270,9 @@ const I18N={
     welcomeH:'Scegli un dipendente',welcomeP:'Seleziona una persona per vedere i turni e chi lavora ogni giorno.',welcomeB:'Seleziona dipendente',
     wd:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],wdf:['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato']}
 };
-const LANGS=[['pt','Português'],['en','English (UK)'],['mt','Malti'],['it','Italiano']];
-let lang='pt', theme='dark';
+const LANGS=[['en','English (UK)','🇬🇧'],['pt','Português','🇧🇷'],['mt','Malti','🇲🇹'],['it','Italiano','🇮🇹']];
+let lang='en', theme='dark';
+function flagOf(code){const f=LANGS.find(l=>l[0]===code);return f?f[2]:code.toUpperCase();}
 function t(k,n){let s=(I18N[lang]&&I18N[lang][k]!==undefined)?I18N[lang][k]:I18N.pt[k];
   if(s&&s.indexOf('|')>=0){const parts=s.split('|');s=(n===1?parts[0]:parts[1]);}
   if(n!==undefined&&s)s=s.replace('{n}',n); return s;}
@@ -554,7 +557,7 @@ function applyStatic(){
   document.getElementById('tabAgenda').textContent=t('agenda');
   document.getElementById('q').placeholder=t('searchPh');
   document.getElementById('closeOv').textContent=t('close');
-  document.getElementById('langBtn').textContent=lang.toUpperCase();
+  document.getElementById('langBtn').textContent=flagOf(lang);
   document.documentElement.lang=lang;
 }
 function setLang(l){ lang=l; if(selEmp)DAYS=buildDays(selEmp); applyStatic(); buildRail(); render(); }
@@ -567,7 +570,7 @@ function themeIcon(){
 function toggleTheme(){ theme=theme==='dark'?'light':'dark'; document.documentElement.dataset.theme=theme; document.getElementById('themeBtn').innerHTML=themeIcon(); }
 function openLangMenu(){
   const m=document.getElementById('langMenu');
-  m.innerHTML=LANGS.map(([code,label])=>`<div class="${code===lang?'on':''}" data-l="${code}">${label}</div>`).join('');
+  m.innerHTML=LANGS.map(([code,label,flag])=>`<div class="${code===lang?'on':''}" data-l="${code}"><span class="fl">${flag}</span>${label}</div>`).join('');
   m.hidden=false;
   const r=document.getElementById('langBtn').getBoundingClientRect();
   m.style.top=(r.bottom+6)+'px'; m.style.right=(window.innerWidth-r.right)+'px';
