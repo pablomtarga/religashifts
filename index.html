@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Meu Turno</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Shift · Desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
   --bg:#0d1017; --surface:#161b24; --surface2:#1d2530; --line:#28303d;
   --text:#e9ecf1; --muted:#7f8a9b; --faint:#576273;
   --morning:#f5a623; --afternoon:#3f8bf6; --night:#9b6cf6;
-  --off:#28c76f; --vac:#f472b6; --alert:#ff5d5d;
+  --off:#28c76f; --vac:#f472b6; --alert:#ff5d5d; --warn:#f5a623;
   --g1:rgba(155,108,246,.10); --g2:rgba(63,139,246,.06);
   --display:'Space Grotesk',sans-serif; --mono:'JetBrains Mono',monospace; --body:'Inter',sans-serif;
 }
@@ -20,579 +20,768 @@
   --bg:#f3f5f8; --surface:#ffffff; --surface2:#eef1f6; --line:#e1e5ec;
   --text:#141922; --muted:#5c6675; --faint:#9aa3b2;
   --morning:#c9790d; --afternoon:#2563eb; --night:#7c3aed;
-  --off:#15a34a; --vac:#db2777; --alert:#e5484d;
+  --off:#15a34a; --vac:#db2777; --alert:#e5484d; --warn:#b45309;
   --g1:rgba(124,58,237,.07); --g2:rgba(37,99,235,.05);
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--bg);color:var(--text);font-family:var(--body)}
-body{background:radial-gradient(120% 60% at 50% -10%, var(--g1), transparent 60%),
-  radial-gradient(90% 50% at 100% 0%, var(--g2), transparent 55%),var(--bg);min-height:100vh}
-.app{max-width:480px;margin:0 auto;padding:0 16px calc(28px + env(safe-area-inset-bottom))}
-header{padding:22px 2px 8px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.brand{display:flex;flex-direction:column;gap:2px}
-.brand .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;color:var(--faint);text-transform:uppercase}
-.brand h1{font-family:var(--display);font-weight:700;font-size:25px;letter-spacing:-.02em;line-height:1}
-.hactions{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.iconbtn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--surface);
-  border:1px solid var(--line);border-radius:11px;cursor:pointer;transition:.15s;color:var(--muted);padding:0}
-.iconbtn:active{transform:scale(.94)} .iconbtn svg{stroke:currentColor}
-.langbtn{font-size:19px;line-height:1;padding:0}
-.langmenu{position:fixed;z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:12px;
-  padding:5px;box-shadow:0 14px 40px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:2px}
-.langmenu div{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);padding:9px 15px 9px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
-.langmenu div .fl{font-size:17px;line-height:1}
-.langmenu div.on{background:var(--surface2);color:var(--text)}
-.langmenu div:active{background:var(--surface2)}
-.today-btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--muted);background:var(--surface);
-  border:1px solid var(--line);padding:9px 13px;border-radius:11px;cursor:pointer;transition:.15s}
-.today-btn:active{transform:scale(.96)} .today-btn.on{color:var(--text);border-color:#3a4557}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--body);height:100%}
+body{background:radial-gradient(90% 40% at 50% -5%,var(--g1),transparent 60%),var(--bg);overflow:hidden}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+.shell{display:grid;grid-template-columns:288px 1fr;height:100vh}
 
-/* employee selector */
-.empsel{width:100%;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
-  border-radius:13px;padding:11px 13px;margin:6px 0 14px;cursor:pointer;transition:.15s;color:var(--text)}
-.empsel:active{transform:scale(.99)}
-.empsel svg{flex:0 0 auto;stroke:var(--muted)}
-.empsel .who{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:-.01em;color:var(--text)}
-.empsel .who small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;margin-bottom:1px}
-.empsel .who #whoName{color:var(--afternoon);font-weight:700}
-.empsel .chg{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--afternoon)}
+/* sidebar */
+.side{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.side .brand{padding:20px 20px 14px;border-bottom:1px solid var(--line)}
+.side .brand .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;color:var(--faint);text-transform:uppercase}
+.side .brand h1{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.02em;margin-top:3px}
+.searchwrap{padding:14px 14px 10px}
+.searchwrap input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:10px;color:var(--text);
+  font-family:var(--body);font-size:13.5px;padding:10px 12px;outline:none}
+.searchwrap input:focus{border-color:var(--afternoon)}
+.emplist{flex:1;overflow-y:auto;padding:0 8px 8px}
+.eitem{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:.1s}
+.eitem:hover{background:var(--surface2)}
+.eitem.on{background:var(--surface2);box-shadow:inset 0 0 0 1.4px var(--afternoon)}
+.eitem .av{width:28px;height:28px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:700;font-size:11px;color:#fff;background:var(--afternoon)}
+.eitem .nm{font-family:var(--display);font-weight:600;font-size:13.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eitem .mini{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--faint)}
+.side .foot{border-top:1px solid var(--line);padding:12px 14px}
+.rolebox{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:7px}
+.roles{display:flex;gap:5px}
+.roles button{flex:1;font-family:var(--display);font-weight:600;font-size:12px;color:var(--muted);background:var(--surface2);
+  border:1px solid var(--line);padding:8px;border-radius:9px;transition:.13s}
+.roles button.on{color:#fff;background:var(--afternoon);border-color:transparent}
 
-/* rail */
-.rail{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.rail::-webkit-scrollbar{display:none}
-.pill{flex:0 0 auto;width:52px;background:var(--surface);border:1px solid var(--line);
-  border-radius:14px;padding:9px 0 8px;text-align:center;cursor:pointer;position:relative;transition:.15s}
-.pill:active{transform:scale(.95)}
-.pill .wd{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.05em}
-.pill .dn{font-family:var(--display);font-weight:600;font-size:18px;margin-top:2px;line-height:1}
-.pill .dot{height:4px;border-radius:3px;margin:7px 9px 0;background:var(--faint)}
-.pill.sel{background:var(--surface2);box-shadow:inset 0 0 0 1.5px currentColor}
-.pill.today .dn{color:#fff}
-.pill.today::after{content:"";position:absolute;top:6px;right:7px;width:5px;height:5px;border-radius:50%;background:var(--text)}
-@keyframes pulseToday{0%{box-shadow:0 0 0 0 rgba(255,255,255,.55)}100%{box-shadow:0 0 0 14px rgba(255,255,255,0)}}
-.pill.flash{animation:pulseToday .75s ease-out}
+/* main */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.topbar{display:flex;align-items:center;gap:8px;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--surface)}
+.vtabs{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:3px}
+.vtabs button{font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);padding:8px 16px;border-radius:8px;transition:.13s}
+.vtabs button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.vtabs button .badge2{display:inline-block;margin-left:6px;font-family:var(--mono);font-size:9.5px;background:var(--alert);color:#fff;border-radius:999px;padding:1px 6px}
+.spacer{flex:1}
+.tb{display:flex;align-items:center;justify-content:center;height:36px;min-width:36px;padding:0 10px;background:var(--surface2);
+  border:1px solid var(--line);border-radius:10px;color:var(--muted);transition:.13s;font-family:var(--mono);font-size:11.5px}
+.tb:hover{color:var(--text)} .tb.flag{font-size:18px;padding:0 9px}
+.content{flex:1;overflow:auto;padding:22px}
 
-/* tabs */
-.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:4px;margin:2px 0 18px}
-.tab{flex:1;text-align:center;font-family:var(--display);font-weight:600;font-size:13.5px;color:var(--muted);padding:9px;border-radius:9px;cursor:pointer;transition:.15s}
-.tab.on{background:var(--surface2);color:var(--text)}
+/* grid view */
+.gridwrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:auto;max-height:100%}
+table.grid{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+table.grid th,table.grid td{border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+table.grid thead th{position:sticky;top:0;z-index:3;background:var(--surface2);font-family:var(--mono);font-weight:500;
+  font-size:10px;color:var(--muted);padding:8px 4px;text-align:center;min-width:40px;line-height:1.5}
+table.grid thead th.wk{color:var(--faint)}
+table.grid thead th.tdy{color:var(--text);background:var(--afternoon);color:#fff}
+table.grid th.nameh{position:sticky;left:0;z-index:5;text-align:left;padding-left:14px;min-width:172px}
+table.grid td.name{position:sticky;left:0;z-index:2;background:var(--surface);font-family:var(--display);font-weight:600;
+  font-size:12.5px;padding:0 14px;white-space:nowrap;cursor:pointer}
+table.grid tr.selrow td.name{color:var(--afternoon)}
+table.grid tr.selrow td{background:var(--surface2)}
+table.grid td.cell{padding:0;text-align:center;height:32px;cursor:pointer;position:relative}
+.cellin{height:22px;margin:5px 3px;border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9.5px;font-weight:500;color:#fff;transition:.1s}
+.cellin:hover{transform:scale(1.12)}
+.cellin.o{background:transparent;color:var(--faint);box-shadow:inset 0 0 0 1px var(--line)}
+.cellin.v{background:var(--vac)}
+.cellin.n{background:transparent;color:var(--faint);opacity:.3}
+td.cell.selc .cellin{box-shadow:0 0 0 2px var(--text)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 4px 0;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 
-/* hero */
-.hero{border-radius:22px;padding:20px 20px 22px;border:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden}
-.hero .glow{position:absolute;inset:0;opacity:.16;background:radial-gradient(90% 130% at 15% 0%,var(--accent),transparent 60%);pointer-events:none}
-.hero .datel{display:flex;align-items:baseline;gap:9px;position:relative}
-.hero .datel .big{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.01em}
-.hero .datel .sub{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.tagrow{display:flex;align-items:center;gap:9px;margin-top:16px;position:relative;flex-wrap:wrap}
-.badge{font-family:var(--display);font-weight:700;font-size:15px;padding:6px 13px;border-radius:999px;color:#0c0f15}
-.loc{font-family:var(--mono);font-size:13px;color:var(--text);background:var(--surface2);border:1px solid var(--line);padding:6px 11px;border-radius:999px}
-.time{font-family:var(--mono);font-size:15px;color:var(--muted);margin-left:auto}
-.time b{color:var(--text);font-weight:500}
-.clock{margin-top:20px;position:relative}
-.clock .track{height:34px;border-radius:9px;background:var(--surface2);border:1px solid var(--line);position:relative;overflow:hidden}
+/* day view */
+.dayhead{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.dayhead h2{font-family:var(--display);font-weight:700;font-size:23px;letter-spacing:-.02em}
+.dayhead .sub{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.hero{border-radius:16px;padding:20px;border:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden;margin-bottom:16px}
+.hero .glow{position:absolute;inset:0;opacity:.15;background:radial-gradient(70% 130% at 10% 0%,var(--accent),transparent 60%)}
+.tagrow{display:flex;align-items:center;gap:10px;position:relative}
+.badge{font-family:var(--display);font-weight:700;font-size:15px;padding:6px 14px;border-radius:999px;color:#fff}
+.loc{font-family:var(--mono);font-size:13px;background:var(--surface2);border:1px solid var(--line);padding:6px 11px;border-radius:999px}
+.time{font-family:var(--mono);font-size:15px;color:var(--muted)}.time b{color:var(--text);font-weight:500}
+.clock{margin-top:16px;position:relative}
+.clock .track{height:30px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);position:relative;overflow:hidden}
 .clock .seg{position:absolute;top:0;bottom:0;background:var(--accent);opacity:.9}
-.clock .seg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 55%)}
-.clock .now{position:absolute;top:-3px;bottom:-3px;width:2px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.8);z-index:3}
-.clock .now::after{content:"agora";position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:8.5px;color:#fff}
-.clock .ticks{display:flex;justify-content:space-between;margin-top:6px}
-.clock .ticks span{font-family:var(--mono);font-size:9.5px;color:var(--faint)}
-.rest{border-radius:22px;padding:30px 22px;border:1px solid var(--line);position:relative;overflow:hidden;background:var(--surface)}
-.rest .glow{position:absolute;inset:0;opacity:.22;background:radial-gradient(80% 120% at 20% 10%,var(--accent),transparent 60%)}
-.rest.big{box-shadow:0 0 0 1px transparent, 0 10px 34px -18px var(--accent)}
-.rest .k{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);position:relative}
-.rest h2{font-family:var(--display);font-weight:700;font-size:30px;margin-top:8px;letter-spacing:-.02em;position:relative;color:var(--accent)}
-.daylabel{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:600;font-size:13.5px;color:var(--text);margin:20px 2px 11px;letter-spacing:-.01em}
-.daylabel span{font-family:var(--mono);font-weight:400;font-size:10.5px;color:var(--faint);background:var(--surface);border:1px solid var(--line);padding:3px 8px;border-radius:999px}
-.rest p{color:var(--muted);font-size:13.5px;margin-top:8px;position:relative;font-family:var(--mono)}
-.blocks{margin-top:16px;display:flex;flex-direction:column;gap:11px}
-.block{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
-.block .lab{display:flex;align-items:center;gap:8px;margin-bottom:11px}
-.block .lab .t{font-family:var(--display);font-weight:600;font-size:14px}
-.block .lab .s{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
-.block .lab .ic{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.clock .now{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text);z-index:3}
+.clock .ticks{display:flex;justify-content:space-between;margin-top:5px}
+.clock .ticks span{font-family:var(--mono);font-size:9px;color:var(--faint)}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.block{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px}
+.block .lab{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.block .lab .ic{width:7px;height:7px;border-radius:50%}
+.block .lab .t{font-family:var(--display);font-weight:600;font-size:13.5px}
+.block .lab .s{font-family:var(--mono);font-size:10px;color:var(--muted)}
 .floor{display:flex;gap:9px;padding:6px 0;border-top:1px solid var(--line)}
 .floor:first-of-type{border-top:none}
-.floor .fl{font-family:var(--mono);font-size:11px;color:var(--muted);flex:0 0 66px;padding-top:1px}
+.floor .fl{font-family:var(--mono);font-size:10.5px;color:var(--muted);flex:0 0 62px}
 .floor .fl.mine{color:var(--off);font-weight:700}
-.floor .nm{font-size:13.5px;line-height:1.5;color:var(--text)}
-.floor .nm .ot{font-family:var(--mono);font-size:10.5px;color:var(--vac);margin-left:3px}
-.empty{color:var(--faint);font-size:13px;font-style:italic}
-.d4{border-radius:14px;padding:12px 14px;font-size:13.5px;display:flex;align-items:center;gap:10px;margin-top:2px}
-.d4 .dt{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
-.d4.bad{background:rgba(255,93,93,.09);border:1px solid rgba(255,93,93,.35)}
-.d4.bad .dt{background:var(--alert)} .d4.bad b{color:var(--alert)}
-.d4.ok{background:rgba(63,139,246,.08);border:1px solid rgba(63,139,246,.3)}
-.d4.ok .dt{background:var(--afternoon)} .d4.ok b{color:var(--afternoon)}
-.d4 .mono{font-family:var(--mono);font-size:12px}
+.floor .nm{font-size:13px;line-height:1.5}
+.floor .nm .ot{font-family:var(--mono);font-size:10px;color:var(--vac);margin-left:3px}
+.empty{color:var(--faint);font-size:12.5px;font-style:italic}
+.rest{border-radius:16px;padding:26px 22px;border:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden;margin-bottom:16px}
+.rest .glow{position:absolute;inset:0;opacity:.2;background:radial-gradient(60% 120% at 15% 10%,var(--accent),transparent 60%)}
+.rest .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);position:relative}
+.rest h2{font-family:var(--display);font-weight:700;font-size:27px;margin-top:6px;color:var(--accent);position:relative}
+.rest p{color:var(--muted);font-size:13px;margin-top:6px;position:relative;font-family:var(--mono)}
+.d4{border-radius:12px;padding:11px 14px;font-size:13px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.d4 .dt{width:9px;height:9px;border-radius:50%}
+.d4.bad{background:rgba(255,93,93,.09);border:1px solid rgba(255,93,93,.35)}.d4.bad .dt{background:var(--alert)}.d4.bad b{color:var(--alert)}
+.d4.ok{background:rgba(63,139,246,.08);border:1px solid rgba(63,139,246,.3)}.d4.ok .dt{background:var(--afternoon)}.d4.ok b{color:var(--afternoon)}
+.daylabel{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:600;font-size:13.5px;margin:18px 2px 10px}
+.daylabel span{font-family:var(--mono);font-weight:400;font-size:10px;color:var(--faint);background:var(--surface);border:1px solid var(--line);padding:3px 8px;border-radius:999px}
+.swapcta{margin-left:auto;position:relative}
+.btn{font-family:var(--display);font-weight:600;font-size:13px;padding:10px 16px;border-radius:10px;transition:.13s;border:1px solid var(--line);background:var(--surface2);color:var(--text)}
+.btn:hover{border-color:var(--afternoon)}
+.btn.primary{background:var(--afternoon);color:#fff;border-color:transparent}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ok{background:var(--off);color:#fff;border-color:transparent}
+.btn.danger{background:transparent;color:var(--alert);border-color:rgba(255,93,93,.4)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.sm{font-size:12px;padding:7px 12px}
 
-/* filters */
-.filters{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.fgroup{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:1px}
-.fgroup::-webkit-scrollbar{display:none}
-.fchip{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--muted);background:var(--surface);
-  border:1px solid var(--line);padding:7px 12px;border-radius:999px;cursor:pointer;transition:.13s;white-space:nowrap}
-.fchip:active{transform:scale(.95)}
-.fchip.on{color:var(--text);border-color:transparent;background:var(--surface2);box-shadow:inset 0 0 0 1.4px var(--afternoon)}
-.count{font-family:var(--mono);font-size:11px;color:var(--faint);padding:0 2px 8px}
-
-/* agenda */
-.week{margin-bottom:16px}
-.week .wh{display:flex;justify-content:space-between;align-items:center;padding:0 4px 8px}
-.week .wh .r{font-family:var(--display);font-weight:700;font-size:14px}
-.week .wh .c{font-family:var(--mono);font-size:11px;color:var(--muted)}
-.arow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:6px;cursor:pointer;transition:.12s}
-.arow:active{transform:scale(.99)}
-.arow .day{font-family:var(--mono);font-size:12px;color:var(--muted);flex:0 0 52px}
-.arow .day b{color:var(--text);font-weight:500}
-.arow .bar{width:3px;align-self:stretch;border-radius:3px;flex:0 0 3px}
-.arow .txt{font-family:var(--display);font-weight:600;font-size:13.5px}
-.arow .rt{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
-.foot{text-align:center;color:var(--faint);font-family:var(--mono);font-size:10.5px;line-height:1.7;margin-top:22px;padding:0 10px}
-.nav{display:flex;gap:8px;margin:16px 0 4px}
-.nav button{flex:1;background:var(--surface);border:1px solid var(--line);color:var(--text);font-family:var(--display);font-weight:600;font-size:14px;padding:12px;border-radius:13px;cursor:pointer;transition:.15s}
-.nav button:active{transform:scale(.97)}
-.nav button:disabled{opacity:.3}
-
-/* search overlay */
-.ov{position:fixed;inset:0;background:rgba(6,8,12,.72);backdrop-filter:blur(3px);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:70px 16px 16px}
-.sheet{width:100%;max-width:448px;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;max-height:78vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.sheet-h{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--line)}
-.sheet-h input{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:11px;color:var(--text);
-  font-family:var(--body);font-size:15px;padding:11px 13px;outline:none}
-.sheet-h input:focus{border-color:var(--afternoon)}
-.sheet-h .cl{font-family:var(--mono);font-size:12px;color:var(--muted);background:none;border:none;padding:0 8px;cursor:pointer}
-.slist{overflow-y:auto;padding:6px}
-.sitem{display:flex;align-items:center;gap:11px;padding:12px 12px;border-radius:11px;cursor:pointer;transition:.1s}
-.sitem:active{background:var(--surface2)}
-.sitem.cur{background:var(--surface2)}
-.sitem .av{width:30px;height:30px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
-  font-family:var(--display);font-weight:700;font-size:12px;color:#0c0f15;background:var(--afternoon)}
-.sitem .nm{font-family:var(--display);font-weight:600;font-size:14.5px}
-.sitem .tag{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--faint)}
-.welcome{border-radius:22px;padding:34px 22px;border:1px dashed var(--line);background:var(--surface);text-align:center;margin-top:4px}
-.welcome .ic{width:46px;height:46px;margin:0 auto 14px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--afternoon)}
-.welcome h2{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.01em}
-.welcome p{color:var(--muted);font-size:13.5px;margin-top:8px;line-height:1.55}
-.welcome button{margin-top:18px;background:var(--afternoon);color:#fff;border:none;font-family:var(--display);font-weight:600;font-size:14px;padding:12px 22px;border-radius:12px;cursor:pointer;transition:.15s}
-.welcome button:active{transform:scale(.97)}
+/* swaps */
+.swapgrid{display:grid;grid-template-columns:400px 1fr;gap:18px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h3{font-family:var(--display);font-weight:700;font-size:15px;margin-bottom:4px}
+.card .hint{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-bottom:14px;line-height:1.6}
+.field{margin-bottom:12px}
+.field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:9px;color:var(--text);
+  font-family:var(--body);font-size:13px;padding:10px;outline:none}
+.field select:focus,.field textarea:focus{border-color:var(--afternoon)}
+.field textarea{resize:vertical;min-height:62px}
+.vbox{border-radius:11px;padding:12px 14px;margin:6px 0 14px;font-size:12.5px;line-height:1.6}
+.vbox.ok{background:rgba(40,199,111,.08);border:1px solid rgba(40,199,111,.35)}
+.vbox.ok b{color:var(--off)}
+.vbox.bad{background:rgba(255,93,93,.08);border:1px solid rgba(255,93,93,.35)}
+.vbox.bad b{color:var(--alert)}
+.vbox .li{font-family:var(--mono);font-size:11px;margin-top:6px;color:var(--muted)}
+.vbox .li b{color:var(--alert)}
+.reqlist{display:flex;flex-direction:column;gap:12px}
+.req{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.req .rh{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.req .st{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+.st.pending{background:rgba(245,166,35,.14);color:var(--warn)}
+.st.approved{background:rgba(40,199,111,.14);color:var(--off)}
+.st.rejected{background:rgba(255,93,93,.12);color:var(--alert)}
+.req .rid{font-family:var(--mono);font-size:10px;color:var(--faint);margin-left:auto}
+.swapviz{display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:10px;padding:16px}
+.leg{background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px}
+.leg .who{font-family:var(--display);font-weight:700;font-size:13.5px;margin-bottom:7px}
+.leg .det{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7}
+.leg .pill2{display:inline-block;font-family:var(--mono);font-size:9.5px;color:#fff;padding:2px 7px;border-radius:999px;margin-right:5px}
+.arrows{text-align:center;font-size:19px;color:var(--afternoon)}
+.chat{border-top:1px solid var(--line);padding:12px 16px;background:var(--surface2)}
+.chat .msgs{display:flex;flex-direction:column;gap:7px;max-height:190px;overflow-y:auto;margin-bottom:9px}
+.msg{font-size:12.5px;line-height:1.5;padding:8px 11px;border-radius:9px;background:var(--surface);border:1px solid var(--line);max-width:82%}
+.msg.me{align-self:flex-end;background:var(--afternoon);color:#fff;border-color:transparent}
+.msg .au{display:block;font-family:var(--mono);font-size:9px;opacity:.75;margin-bottom:2px}
+.msg.sys{align-self:center;max-width:100%;background:transparent;border:none;font-family:var(--mono);font-size:10px;color:var(--faint);text-align:center}
+.chatin{display:flex;gap:7px}
+.chatin input{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:9px;color:var(--text);font-size:13px;padding:9px 11px;outline:none}
+.chatin input:focus{border-color:var(--afternoon)}
+.acts{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.acts .note{font-family:var(--mono);font-size:10px;color:var(--faint);align-self:center;margin-left:auto}
+.emptybox{text-align:center;padding:44px 20px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);background:var(--surface)}
+.emptybox h3{font-family:var(--display);font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px}
+.emptybox p{font-size:13px}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--off);
+  border-radius:11px;padding:13px 17px;box-shadow:0 16px 44px rgba(0,0,0,.4);z-index:80;max-width:370px}
+.toast .tt{font-family:var(--display);font-weight:700;font-size:13.5px;margin-bottom:3px}
+.toast .tx{font-size:12.5px;color:var(--muted);line-height:1.5}
+.langmenu{position:fixed;z-index:70;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:5px;
+  box-shadow:0 14px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:2px}
+.langmenu div{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:600;font-size:12.5px;color:var(--muted);padding:8px 15px 8px 11px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.langmenu div .fl{font-size:16px}
+.langmenu div.on{background:var(--surface2);color:var(--text)}
+.pickday{display:flex;flex-wrap:wrap;gap:5px;max-height:132px;overflow-y:auto;padding:2px}
+.pickday button{font-family:var(--mono);font-size:10.5px;padding:6px 8px;border-radius:7px;border:1px solid var(--line);
+  background:var(--surface2);color:var(--muted);transition:.1s}
+.pickday button:hover{color:var(--text)}
+.pickday button.on{color:#fff;border-color:transparent}
 [hidden]{display:none!important}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
+::-webkit-scrollbar-track{background:transparent}
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div class="brand"><span class="kicker" id="kicker">Escala · Malta</span><h1 id="appTitle">Meu Turno</h1></div>
-    <div class="hactions">
-      <button class="iconbtn" id="themeBtn" aria-label="tema"></button>
-      <button class="iconbtn langbtn" id="langBtn">🇬🇧</button>
-      <button class="today-btn" id="todayBtn">Hoje</button>
+<div class="shell">
+  <aside class="side">
+    <div class="brand"><div class="k" id="kicker">Roster · Malta</div><h1 id="appTitle">My Shift</h1></div>
+    <div class="searchwrap"><input id="q" type="text" placeholder="Search employee..."></div>
+    <div class="emplist" id="emplist"></div>
+    <div class="foot">
+      <div class="rolebox" id="roleLabel">Access level</div>
+      <div class="roles">
+        <button id="roleEmp" class="on">Employee</button>
+        <button id="roleCtl">Controller</button>
+      </div>
     </div>
-  </header>
-  <button class="empsel" id="empBtn">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
-    <span class="who"><small id="funcLabel">Funcionário</small><span id="whoName">Selecionar</span></span>
-    <span class="chg" id="chgLabel">trocar</span>
-  </button>
-  <div class="rail" id="rail"></div>
-  <nav class="tabs">
-    <div class="tab on" data-tab="today" id="tabToday">Hoje</div>
-    <div class="tab" data-tab="agenda" id="tabAgenda">Agenda</div>
-  </nav>
-  <main id="viewToday"></main>
-  <main id="viewAgenda" hidden></main>
-</div>
-<div class="langmenu" id="langMenu" hidden></div>
-
-<div class="ov" id="ov" hidden>
-  <div class="sheet">
-    <div class="sheet-h">
-      <input id="q" type="text" placeholder="Buscar funcionário..." autocomplete="off">
-      <button class="cl" id="closeOv">Fechar</button>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="vtabs">
+        <button data-v="grid" class="on" id="tabGrid">Roster</button>
+        <button data-v="day" id="tabDay">Day</button>
+        <button data-v="swap" id="tabSwap">Swaps</button>
+      </div>
+      <div class="spacer"></div>
+      <button class="tb" id="todayBtn">Today</button>
+      <button class="tb flag" id="langBtn">🇬🇧</button>
+      <button class="tb" id="themeBtn"></button>
     </div>
-    <div class="slist" id="slist"></div>
+    <div class="content" id="content"></div>
   </div>
 </div>
+<div class="langmenu" id="langMenu" hidden></div>
+<div id="toastWrap"></div>
 
 <script>
-const DATA = {"meta":{"start":"2026-07-25","end":"2026-08-31"},"employees":["Pablo Targa","Andreas Vasileiadis","Camila Andrade","Chandan Sing Pela","Daniel","Deyan","Dzuliano","Gatis Sipols","Hilfran Marquez","Joao Vitor","Kendrick","Lokendra","Lucas Rodriguez","Maxine","Neil","Riccardo","Salman Shaikh","Shaun"],"roster":{"2026-07-25":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Maxine":{"s":"v"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Joao Vitor":{"s":"v"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"}},"2026-07-26":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"v"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"v"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"}},"2026-08-01":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-02":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-08":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Kendrick":{"s":"v"}},"2026-08-09":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -4"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-15":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"}},"2026-08-16":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Deyan":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"}},"2026-08-22":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Pablo Targa":{"s":"v"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"}},"2026-08-23":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-29":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"v"}},"2026-08-30":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"v"},"Deyan":{"s":"v"}},"2026-07-24":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Maxine":{"s":"v"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Joao Vitor":{"s":"v"},"Pablo Targa":{"s":"o"}},"2026-07-27":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"v"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"}},"2026-07-28":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"}},"2026-07-29":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"}},"2026-07-30":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"}},"2026-07-31":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-03":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"}},"2026-08-04":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-05":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"v"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"o"}},"2026-08-06":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"v"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-07":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-10":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-11":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -4"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Pablo Targa":{"s":"o"}},"2026-08-12":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -4"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-13":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-14":{"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-17":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"o"}},"2026-08-18":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-19":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"v"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"}},"2026-08-20":{"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"v"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Deyan":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"}},"2026-08-21":{"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"v"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-24":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-25":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-26":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Kendrick":{"s":"v"}},"2026-08-27":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Kendrick":{"s":"v"}},"2026-08-28":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Pablo Targa":{"s":"v"},"Kendrick":{"s":"v"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"}},"2026-08-31":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Joao Vitor":{"s":"v"},"Pablo Targa":{"s":"v"},"Kendrick":{"s":"v"},"Deyan":{"s":"v"}},"2026-09-01":{"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"v"},"Deyan":{"s":"v"}}}};
-const ROSTER = DATA.roster, EMPLOYEES = DATA.employees, META = DATA.meta;
+const DATA={"meta":{"start":"2026-07-25","end":"2026-08-31"},"employees":["Pablo Targa","Andreas Vasileiadis","Camila Andrade","Chandan Sing Pela","Daniel","Deyan","Dzuliano","Gatis Sipols","Hilfran Marquez","Joao Vitor","Kendrick","Lokendra","Lucas Rodriguez","Maxine","Neil","Riccardo","Salman Shaikh","Shaun"],"roster":{"2026-07-25":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Maxine":{"s":"v"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Joao Vitor":{"s":"v"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"}},"2026-07-26":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"v"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"v"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"}},"2026-08-01":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-02":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-08":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Kendrick":{"s":"v"}},"2026-08-09":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -4"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-15":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"}},"2026-08-16":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Deyan":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"}},"2026-08-22":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Pablo Targa":{"s":"v"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"}},"2026-08-23":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-29":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"v"}},"2026-08-30":{"Riccardo":{"s":"o"},"Neil":{"s":"o"},"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"v"},"Deyan":{"s":"v"}},"2026-07-24":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Maxine":{"s":"v"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Joao Vitor":{"s":"v"},"Pablo Targa":{"s":"o"}},"2026-07-27":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"v"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"}},"2026-07-28":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"}},"2026-07-29":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"}},"2026-07-30":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"}},"2026-07-31":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Slots"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-03":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"}},"2026-08-04":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-05":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"v"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"o"}},"2026-08-06":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"v"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-07":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-10":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"o"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Pablo Targa":{"s":"o"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-11":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -4"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Pablo Targa":{"s":"o"}},"2026-08-12":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -4"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-13":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-14":{"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-17":{"Lokendra":{"s":"o"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"o"}},"2026-08-18":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Dzuliano":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-19":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Pablo Targa":{"s":"v"},"Kendrick":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"}},"2026-08-20":{"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"v"},"Kendrick":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Deyan":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"}},"2026-08-21":{"Lokendra":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Salman Shaikh":{"s":"v"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"v"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"}},"2026-08-24":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"o"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -4"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-25":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Shaun":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"}},"2026-08-26":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"o"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Salman Shaikh":{"s":"o"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Kendrick":{"s":"v"}},"2026-08-27":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Salman Shaikh":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Kendrick":{"s":"v"}},"2026-08-28":{"Lokendra":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Daniel":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"o"},"Andreas Vasileiadis":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Hilfran Marquez":{"s":"o"},"Gatis Sipols":{"s":"w","p":"Turno","i":"","f":"","l":"n/d"},"Chandan Sing Pela":{"s":"o"},"Lucas Rodriguez":{"s":"o"},"Salman Shaikh":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Joao Vitor":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Pablo Targa":{"s":"v"},"Kendrick":{"s":"v"},"Deyan":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"}},"2026-08-31":{"Lokendra":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -1"},"Camila Andrade":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Bugibba"},"Daniel":{"s":"o"},"Shaun":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -5"},"Dzuliano":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -5"},"Maxine":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Bugibba"},"Andreas Vasileiadis":{"s":"o"},"Hilfran Marquez":{"s":"w","p":"Manhã","i":"07:00","f":"15:00","l":"Desk -5"},"Gatis Sipols":{"s":"o"},"Chandan Sing Pela":{"s":"w","p":"Tarde","i":"15:00","f":"23:00","l":"Desk -1"},"Lucas Rodriguez":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Bugibba"},"Salman Shaikh":{"s":"w","p":"Noite","i":"23:00","f":"07:00","l":"Desk -1"},"Joao Vitor":{"s":"v"},"Pablo Targa":{"s":"v"},"Kendrick":{"s":"v"},"Deyan":{"s":"v"}},"2026-09-01":{"Joao Vitor":{"s":"o"},"Pablo Targa":{"s":"v"},"Deyan":{"s":"v"}}}};
+const ROSTER=DATA.roster, EMPLOYEES=DATA.employees, META=DATA.meta;
+const PHEX={'Manhã':'#f5a623','Tarde':'#3f8bf6','Noite':'#9b6cf6'};
+const PCOL={'Manhã':'var(--morning)','Tarde':'var(--afternoon)','Noite':'var(--night)'};
+const LOC_ORDER=['Desk -1','Desk -4','Desk -5','Bugibba','Slots','n/d'];
+const PADRAO={'Manhã':['07:00','15:00'],'Tarde':['15:00','23:00'],'Noite':['23:00','07:00']};
+const PREV={'Manhã':['Noite',-1],'Tarde':['Manhã',0],'Noite':['Tarde',0]};
+const NEXT={'Manhã':['Tarde',0],'Tarde':['Noite',0],'Noite':['Manhã',1]};
+const MIN_REST=12;
+
 const I18N={
-  pt:{title:'Meu Turno',kicker:'Escala · Malta',today:'Hoje',agenda:'Agenda',funcLabel:'Funcionário',
-    select:'Selecionar',change:'trocar',off:'Folga',vac:'Férias',noshift:'Sem turno',
-    handTo:'Passa pra {n}',sameTime:'No mesmo horário',handFrom:'{n} passa pra',otherFloors:'outros pisos',
-    searchPh:'Buscar funcionário...',close:'Fechar',nobody:'ninguém escalado',current:'atual',notFound:'ninguém encontrado',
-    d4bad:'Desk -4 sem cobertura',d4ok:'Desk -4 coberto:',atTime:'no horário',
-    whoWorks:'Quem trabalha neste dia',people:'{n} pessoa|{n} pessoas',nobodyDay:'Ninguém escalado neste dia.',
-    prev:'‹ Anterior',next:'Próximo ›',fAll:'Tudo',fWork:'Trabalho',fTurno:'Todo turno',fSite:'Todo site',
-    Manhã:'Manhã',Tarde:'Tarde',Noite:'Noite',hojeWord:'hoje',
-    restOff:'Dia livre. Veja quem trabalha hoje.',restVac:'Dia de férias. Veja quem cobre o dia.',
-    noFilter:'nenhum dia com esse filtro',daysN:'{n} dia|{n} dias',wTrab:'trab',wFolga:'folga',wFer:'fér',
-    footer:'Pisos: Desk -1, -4, -5, Bugibba, Slots · ★ = mesmo posto',
-    welcomeH:'Escolha um funcionário',welcomeP:'Selecione uma pessoa para ver a escala, os turnos e quem trabalha em cada dia.',welcomeB:'Selecionar funcionário',
-    wd:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],wdf:['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']},
-  en:{title:'My Shift',kicker:'Roster · Malta',today:'Today',agenda:'Schedule',funcLabel:'Employee',
-    select:'Select',change:'change',off:'Day off',vac:'Holiday',noshift:'No shift',
-    handTo:'Handover to {n}',sameTime:'Same time',handFrom:'{n} hands over to',otherFloors:'other floors',
-    searchPh:'Search employee...',close:'Close',nobody:'nobody scheduled',current:'current',notFound:'nobody found',
-    d4bad:'Desk -4 uncovered',d4ok:'Desk -4 covered:',atTime:'at this time',
-    whoWorks:'Who works this day',people:'{n} person|{n} people',nobodyDay:'Nobody scheduled this day.',
-    prev:'‹ Previous',next:'Next ›',fAll:'All',fWork:'Work',fTurno:'Any shift',fSite:'Any site',
-    Manhã:'Morning',Tarde:'Afternoon',Noite:'Night',hojeWord:'today',
-    restOff:'Day off. See who works today.',restVac:'On holiday. See who covers the day.',
-    noFilter:'no days match this filter',daysN:'{n} day|{n} days',wTrab:'work',wFolga:'off',wFer:'hol',
-    footer:'Floors: Desk -1, -4, -5, Bugibba, Slots · ★ = same post',
-    welcomeH:'Choose an employee',welcomeP:'Pick a person to see the roster, shifts and who works each day.',welcomeB:'Select employee',
-    wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],wdf:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']},
-  mt:{title:'Ix-Xift Tiegħi',kicker:'Skeda · Malta',today:'Illum',agenda:'Skeda',funcLabel:'Impjegat',
-    select:'Agħżel',change:'ibdel',off:'Btala',vac:'Vaganzi',noshift:'L-ebda xift',
-    handTo:'Jgħaddi lil {n}',sameTime:'Fl-istess ħin',handFrom:'{n} jgħaddi lil',otherFloors:'sulari oħra',
-    searchPh:'Fittex impjegat...',close:'Agħlaq',nobody:'ħadd mhu skedat',current:'attwali',notFound:'ħadd ma nstab',
-    d4bad:'Desk -4 mhux kopert',d4ok:'Desk -4 kopert:',atTime:'f\u2019dan il-ħin',
-    whoWorks:'Min jaħdem dan il-jum',people:'{n} persuna|{n} persuni',nobodyDay:'Ħadd mhu skedat dan il-jum.',
-    prev:'‹ Ta\u2019 qabel',next:'Li jmiss ›',fAll:'Kollox',fWork:'Xogħol',fTurno:'Kull xift',fSite:'Kull sit',
-    Manhã:'Filgħodu',Tarde:'Wara nofsinhar',Noite:'Bil-lejl',hojeWord:'illum',
-    restOff:'Jum ta\u2019 btala. Ara min jaħdem illum.',restVac:'Fuq vaganzi. Ara min qed ikopri l-jum.',
-    noFilter:'l-ebda jum ma jaqbel ma\u2019 dan il-filtru',daysN:'{n} jum|{n} ijiem',wTrab:'xogħol',wFolga:'btala',wFer:'vag',
-    footer:'Sulari: Desk -1, -4, -5, Bugibba, Slots · ★ = l-istess post',
-    welcomeH:'Agħżel impjegat',welcomeP:'Agħżel persuna biex tara l-iskeda, ix-xifts u min jaħdem kull jum.',welcomeB:'Agħżel impjegat',
-    wd:['Ħad','Tne','Tli','Erb','Ħam','Ġim','Sib'],wdf:['Il-Ħadd','It-Tnejn','It-Tlieta','L-Erbgħa','Il-Ħamis','Il-Ġimgħa','Is-Sibt']},
-  it:{title:'Il Mio Turno',kicker:'Turni · Malta',today:'Oggi',agenda:'Agenda',funcLabel:'Dipendente',
-    select:'Seleziona',change:'cambia',off:'Riposo',vac:'Ferie',noshift:'Nessun turno',
-    handTo:'Passa a {n}',sameTime:'Stesso orario',handFrom:'{n} passa a',otherFloors:'altri piani',
-    searchPh:'Cerca dipendente...',close:'Chiudi',nobody:'nessuno in turno',current:'attuale',notFound:'nessuno trovato',
-    d4bad:'Desk -4 scoperto',d4ok:'Desk -4 coperto:',atTime:'in questo orario',
-    whoWorks:'Chi lavora in questo giorno',people:'{n} persona|{n} persone',nobodyDay:'Nessuno in turno questo giorno.',
-    prev:'‹ Precedente',next:'Successivo ›',fAll:'Tutto',fWork:'Lavoro',fTurno:'Ogni turno',fSite:'Ogni sito',
-    Manhã:'Mattina',Tarde:'Pomeriggio',Noite:'Notte',hojeWord:'oggi',
-    restOff:'Giorno di riposo. Guarda chi lavora oggi.',restVac:'In ferie. Guarda chi copre il giorno.',
-    noFilter:'nessun giorno corrisponde al filtro',daysN:'{n} giorno|{n} giorni',wTrab:'lav',wFolga:'rip',wFer:'fer',
-    footer:'Piani: Desk -1, -4, -5, Bugibba, Slots · ★ = stessa postazione',
-    welcomeH:'Scegli un dipendente',welcomeP:'Seleziona una persona per vedere i turni e chi lavora ogni giorno.',welcomeB:'Seleziona dipendente',
-    wd:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],wdf:['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato']}
+ en:{title:'My Shift',kicker:'Roster · Malta',today:'Today',roster:'Roster',day:'Day',swaps:'Swaps',
+  searchPh:'Search employee...',access:'Access level',employee:'Employee',controller:'Controller',
+  off:'Day off',vac:'Holiday',noshift:'No shift',morning:'Morning',afternoon:'Afternoon',night:'Night',
+  handTo:'Handover to',sameTime:'Same time',handFrom:'hands over to',otherFloors:'other floors',nobody:'nobody scheduled',
+  d4bad:'Desk -4 uncovered',d4ok:'Desk -4 covered:',atTime:'at this time',
+  whoWorks:'Who works this day',people:'{n} person|{n} people',
+  reqSwap:'Request swap',newReq:'New swap request',
+  newReqHint:'Pick one of your shifts and the colleague’s shift you want to take. The 12-hour rest rule is checked automatically before you can submit.',
+  yourShift:'Your shift',colleague:'Colleague',theirShift:'Their shift',msgToCol:'Message to colleague',
+  msgPh:'Explain why you need the swap...',submit:'Submit request',selShift:'Select a shift',selCol:'Select a colleague',
+  validOk:'Swap allowed',validOkTx:'Both schedules keep at least 12 hours of rest between shifts.',
+  validBad:'Swap blocked',validBadTx:'This swap breaks the minimum rest rule:',
+  restBroken:'only {h}h rest between {a} and {b}',conflict:'{n} already has a shift on {d}',
+  pending:'Pending',approved:'Approved',rejected:'Rejected',
+  noReq:'No swap requests',noReqTx:'Requests you create will appear here, waiting for a controller to decide.',
+  noReqCtl:'Nothing to review',noReqCtlTx:'Approved and rejected requests will be kept here as history.',
+  approve:'Approve',reject:'Reject',onlyCtl:'Only a controller can decide',
+  sendPh:'Write a message...',send:'Send',
+  apprd:'Swap approved',apprdTx:'{a} and {b} were notified. The roster has been updated.',
+  rejd:'Swap rejected',rejdTx:'{a} and {b} were notified.',
+  sysCreated:'Request created and sent to the controller',
+  sysApproved:'Approved by controller · roster updated',sysRejected:'Rejected by controller',
+  emailBtn:'Send confirmation email',gives:'gives',gets:'gets',
+  legWork:'Shift',legOff:'Day off',legVac:'Holiday',legToday:'Today',
+  pickDay:'Day to swap',reqBy:'Requested by',rest:'rest'},
+ pt:{title:'Meu Turno',kicker:'Escala · Malta',today:'Hoje',roster:'Escala',day:'Dia',swaps:'Trocas',
+  searchPh:'Buscar funcionário...',access:'Nível de acesso',employee:'Funcionário',controller:'Controlador',
+  off:'Folga',vac:'Férias',noshift:'Sem turno',morning:'Manhã',afternoon:'Tarde',night:'Noite',
+  handTo:'Passa pra',sameTime:'No mesmo horário',handFrom:'passa pra',otherFloors:'outros pisos',nobody:'ninguém escalado',
+  d4bad:'Desk -4 sem cobertura',d4ok:'Desk -4 coberto:',atTime:'no horário',
+  whoWorks:'Quem trabalha neste dia',people:'{n} pessoa|{n} pessoas',
+  reqSwap:'Pedir troca',newReq:'Novo pedido de troca',
+  newReqHint:'Escolha um turno seu e o turno do colega que você quer assumir. A regra de 12 horas de descanso é verificada automaticamente antes do envio.',
+  yourShift:'Seu turno',colleague:'Colega',theirShift:'Turno do colega',msgToCol:'Mensagem para o colega',
+  msgPh:'Explique por que precisa da troca...',submit:'Enviar pedido',selShift:'Selecione um turno',selCol:'Selecione um colega',
+  validOk:'Troca permitida',validOkTx:'As duas escalas mantêm pelo menos 12 horas de descanso entre turnos.',
+  validBad:'Troca bloqueada',validBadTx:'Esta troca quebra a regra de descanso mínimo:',
+  restBroken:'só {h}h de descanso entre {a} e {b}',conflict:'{n} já tem turno em {d}',
+  pending:'Pendente',approved:'Aprovado',rejected:'Recusado',
+  noReq:'Nenhum pedido de troca',noReqTx:'Os pedidos que você criar aparecem aqui, aguardando a decisão do controlador.',
+  noReqCtl:'Nada para revisar',noReqCtlTx:'Pedidos aprovados e recusados ficam aqui como histórico.',
+  approve:'Aprovar',reject:'Recusar',onlyCtl:'Só um controlador pode decidir',
+  sendPh:'Escreva uma mensagem...',send:'Enviar',
+  apprd:'Troca aprovada',apprdTx:'{a} e {b} foram notificados. A escala foi atualizada.',
+  rejd:'Troca recusada',rejdTx:'{a} e {b} foram notificados.',
+  sysCreated:'Pedido criado e enviado ao controlador',
+  sysApproved:'Aprovado pelo controlador · escala atualizada',sysRejected:'Recusado pelo controlador',
+  emailBtn:'Enviar e-mail de confirmação',gives:'entrega',gets:'recebe',
+  legWork:'Turno',legOff:'Folga',legVac:'Férias',legToday:'Hoje',
+  pickDay:'Dia da troca',reqBy:'Pedido de',rest:'descanso'},
+ mt:{title:'Ix-Xift Tiegħi',kicker:'Skeda · Malta',today:'Illum',roster:'Skeda',day:'Jum',swaps:'Bdil',
+  searchPh:'Fittex impjegat...',access:'Livell ta’ aċċess',employee:'Impjegat',controller:'Kontrollur',
+  off:'Btala',vac:'Vaganzi',noshift:'L-ebda xift',morning:'Filgħodu',afternoon:'Wara nofsinhar',night:'Bil-lejl',
+  handTo:'Jgħaddi lil',sameTime:'Fl-istess ħin',handFrom:'jgħaddi lil',otherFloors:'sulari oħra',nobody:'ħadd mhu skedat',
+  d4bad:'Desk -4 mhux kopert',d4ok:'Desk -4 kopert:',atTime:'f’dan il-ħin',
+  whoWorks:'Min jaħdem dan il-jum',people:'{n} persuna|{n} persuni',
+  reqSwap:'Itlob bdil',newReq:'Talba ġdida ta’ bdil',
+  newReqHint:'Agħżel xift tiegħek u x-xift tal-kollega li trid tieħu. Ir-regola ta’ 12-il siegħa mistrieħ tiġi ċċekkjata awtomatikament.',
+  yourShift:'Ix-xift tiegħek',colleague:'Kollega',theirShift:'Ix-xift tagħhom',msgToCol:'Messaġġ lill-kollega',
+  msgPh:'Spjega għaliex għandek bżonn il-bdil...',submit:'Ibgħat it-talba',selShift:'Agħżel xift',selCol:'Agħżel kollega',
+  validOk:'Bdil permess',validOkTx:'Iż-żewġ skedi jżommu mill-inqas 12-il siegħa mistrieħ bejn ix-xiftijiet.',
+  validBad:'Bdil imblukkat',validBadTx:'Dan il-bdil jikser ir-regola tal-mistrieħ minimu:',
+  restBroken:'{h}h mistrieħ biss bejn {a} u {b}',conflict:'{n} diġà għandu xift fi {d}',
+  pending:'Pendenti',approved:'Approvat',rejected:'Miċħud',
+  noReq:'L-ebda talba ta’ bdil',noReqTx:'It-talbiet li toħloq jidhru hawn, jistennew deċiżjoni tal-kontrollur.',
+  noReqCtl:'Xejn x’tirrevedi',noReqCtlTx:'It-talbiet approvati u miċħuda jinżammu hawn bħala storja.',
+  approve:'Approva',reject:'Iċħad',onlyCtl:'Kontrollur biss jista’ jiddeċiedi',
+  sendPh:'Ikteb messaġġ...',send:'Ibgħat',
+  apprd:'Bdil approvat',apprdTx:'{a} u {b} ġew notifikati. L-iskeda ġiet aġġornata.',
+  rejd:'Bdil miċħud',rejdTx:'{a} u {b} ġew notifikati.',
+  sysCreated:'Talba maħluqa u mibgħuta lill-kontrollur',
+  sysApproved:'Approvata mill-kontrollur · skeda aġġornata',sysRejected:'Miċħuda mill-kontrollur',
+  emailBtn:'Ibgħat email ta’ konferma',gives:'jagħti',gets:'jieħu',
+  legWork:'Xift',legOff:'Btala',legVac:'Vaganzi',legToday:'Illum',
+  pickDay:'Jum tal-bdil',reqBy:'Mitlub minn',rest:'mistrieħ'},
+ it:{title:'Il Mio Turno',kicker:'Turni · Malta',today:'Oggi',roster:'Turni',day:'Giorno',swaps:'Scambi',
+  searchPh:'Cerca dipendente...',access:'Livello di accesso',employee:'Dipendente',controller:'Controllore',
+  off:'Riposo',vac:'Ferie',noshift:'Nessun turno',morning:'Mattina',afternoon:'Pomeriggio',night:'Notte',
+  handTo:'Passa a',sameTime:'Stesso orario',handFrom:'passa a',otherFloors:'altri piani',nobody:'nessuno in turno',
+  d4bad:'Desk -4 scoperto',d4ok:'Desk -4 coperto:',atTime:'in questo orario',
+  whoWorks:'Chi lavora in questo giorno',people:'{n} persona|{n} persone',
+  reqSwap:'Richiedi scambio',newReq:'Nuova richiesta di scambio',
+  newReqHint:'Scegli un tuo turno e il turno del collega che vuoi prendere. La regola delle 12 ore di riposo è verificata automaticamente.',
+  yourShift:'Il tuo turno',colleague:'Collega',theirShift:'Il suo turno',msgToCol:'Messaggio al collega',
+  msgPh:'Spiega perché ti serve lo scambio...',submit:'Invia richiesta',selShift:'Seleziona un turno',selCol:'Seleziona un collega',
+  validOk:'Scambio consentito',validOkTx:'Entrambi gli orari mantengono almeno 12 ore di riposo tra i turni.',
+  validBad:'Scambio bloccato',validBadTx:'Questo scambio viola la regola del riposo minimo:',
+  restBroken:'solo {h}h di riposo tra {a} e {b}',conflict:'{n} ha già un turno il {d}',
+  pending:'In attesa',approved:'Approvato',rejected:'Rifiutato',
+  noReq:'Nessuna richiesta di scambio',noReqTx:'Le richieste che crei appariranno qui, in attesa del controllore.',
+  noReqCtl:'Niente da rivedere',noReqCtlTx:'Le richieste approvate e rifiutate restano qui come cronologia.',
+  approve:'Approva',reject:'Rifiuta',onlyCtl:'Solo un controllore può decidere',
+  sendPh:'Scrivi un messaggio...',send:'Invia',
+  apprd:'Scambio approvato',apprdTx:'{a} e {b} sono stati avvisati. I turni sono stati aggiornati.',
+  rejd:'Scambio rifiutato',rejdTx:'{a} e {b} sono stati avvisati.',
+  sysCreated:'Richiesta creata e inviata al controllore',
+  sysApproved:'Approvata dal controllore · turni aggiornati',sysRejected:'Rifiutata dal controllore',
+  emailBtn:'Invia email di conferma',gives:'cede',gets:'riceve',
+  legWork:'Turno',legOff:'Riposo',legVac:'Ferie',legToday:'Oggi',
+  pickDay:'Giorno dello scambio',reqBy:'Richiesto da',rest:'riposo'}
 };
 const LANGS=[['en','English (UK)','🇬🇧'],['pt','Português','🇧🇷'],['mt','Malti','🇲🇹'],['it','Italiano','🇮🇹']];
-let lang='en', theme='dark';
-function flagOf(code){const f=LANGS.find(l=>l[0]===code);return f?f[2]:code.toUpperCase();}
-function t(k,n){let s=(I18N[lang]&&I18N[lang][k]!==undefined)?I18N[lang][k]:I18N.pt[k];
-  if(s&&s.indexOf('|')>=0){const parts=s.split('|');s=(n===1?parts[0]:parts[1]);}
-  if(n!==undefined&&s)s=s.replace('{n}',n); return s;}
-function tp(per){return t(per)||per;} // periodo traduzido
-const PHEX = {'Manhã':'#f5a623','Tarde':'#3f8bf6','Noite':'#9b6cf6'};
-const PCOL = {'Manhã':'var(--morning)','Tarde':'var(--afternoon)','Noite':'var(--night)'};
-const LOC_ORDER = ['Desk -1','Desk -4','Desk -5','Bugibba','Slots','n/d'];
-const SITES = ['Bugibba','Desk -1','Desk -4','Desk -5','Slots'];
-const PADRAO = {'Manhã':['07:00','15:00'],'Tarde':['15:00','23:00'],'Noite':['23:00','07:00']};
-const PREV = {'Manhã':['Noite',-1,'saem 07:00'],'Tarde':['Manhã',0,'saem 15:00'],'Noite':['Tarde',0,'saem 23:00']};
-const NEXT = {'Manhã':['Tarde',0,'entram 15:00'],'Tarde':['Noite',0,'entram 23:00'],'Noite':['Manhã',1,'entram 07:00']};
-function WDa(){return I18N[lang].wd||I18N.pt.wd;}
-function WDFa(){return I18N[lang].wdf||I18N.pt.wdf;}
+const WDS={en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],pt:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+  mt:['Ħad','Tne','Tli','Erb','Ħam','Ġim','Sib'],it:['Dom','Lun','Mar','Mer','Gio','Ven','Sab']};
+const WDF={en:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+  pt:['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+  mt:['Il-Ħadd','It-Tnejn','It-Tlieta','L-Erbgħa','Il-Ħamis','Il-Ġimgħa','Is-Sibt'],
+  it:['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato']};
+const PERKEY={'Manhã':'morning','Tarde':'afternoon','Noite':'night'};
 
-let selEmp = null;
-let cur = 0, tab='today';
-let filter = {tipo:'all', turno:'all', site:'all'};
+let lang='en', theme='dark', view='grid', role='employee';
+let selEmp=null, selDate=null;
+let OVERRIDES={};      // "date|emp" -> record (escala atualizada apos aprovacao)
+let REQUESTS=[];       // pedidos de troca
+let reqSeq=1;
 
+function t(k,n){let s=(I18N[lang]&&I18N[lang][k]!==undefined)?I18N[lang][k]:I18N.en[k];
+  if(s&&s.indexOf('|')>=0){const p=s.split('|');s=(n===1?p[0]:p[1]);}
+  if(n!==undefined&&s)s=s.replace('{n}',n);return s;}
+function tp(per){return t(PERKEY[per])||per;}
+function flagOf(c){const f=LANGS.find(l=>l[0]===c);return f?f[2]:c;}
 function pad(n){return String(n).padStart(2,'0');}
 function todayISO(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function addDays(iso,n){const d=new Date(iso+'T00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function ddmm(iso){return iso.slice(8)+'/'+iso.slice(5,7);}
 function wdOf(iso){return new Date(iso+'T00:00').getDay();}
 function firstName(n){return n.split(' ')[0];}
+function initials(n){const p=n.split(' ');return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
+function allDates(){const out=[];let i=META.start;while(i<=META.end){out.push(i);i=addDays(i,1);}return out;}
+const DATES=allDates();
 
-function workersOn(iso, per, opt){
-  opt=opt||{};
-  const day=ROSTER[iso]||{}; const by={};
-  for(const name in day){
-    const r=day[name];
-    if(r.s!=='w' || r.p!==per) continue;
-    if(opt.exclude && name===opt.exclude) continue;
-    if(opt.dropLoc && r.l===opt.dropLoc) continue;
+/* ---------- escala com overrides aplicados ---------- */
+function recOf(iso,emp){
+  const k=iso+'|'+emp;
+  if(OVERRIDES[k]!==undefined) return OVERRIDES[k];
+  return (ROSTER[iso]||{})[emp]||null;
+}
+function scheduleOf(emp){
+  const out={};
+  DATES.concat([addDays(META.start,-1),addDays(META.end,1)]).forEach(d=>{const r=recOf(d,emp);if(r)out[d]=r;});
+  return out;
+}
+function workersOn(iso,per,opt){
+  opt=opt||{};const by={};
+  const names=new Set(Object.keys(ROSTER[iso]||{}));
+  EMPLOYEES.forEach(n=>{if(OVERRIDES[iso+'|'+n]!==undefined)names.add(n);});
+  names.forEach(name=>{
+    const r=recOf(iso,name);
+    if(!r||r.s!=='w'||r.p!==per)return;
+    if(opt.exclude&&name===opt.exclude)return;
+    if(opt.dropLoc&&r.l===opt.dropLoc)return;
     const std=PADRAO[per];
-    const ot=(std && r.i && r.f && (r.i!==std[0]||r.f!==std[1]))?(r.i+'-'+r.f):null;
+    const ot=(std&&r.i&&r.f&&(r.i!==std[0]||r.f!==std[1]))?(r.i+'-'+r.f):null;
     (by[r.l]=by[r.l]||[]).push({n:name,ot});
-  }
+  });
   const out=[];
-  for(const loc of LOC_ORDER){ if(by[loc]){ by[loc].sort((a,b)=>a.n.localeCompare(b.n)); out.push({loc,people:by[loc]});}}
+  LOC_ORDER.forEach(loc=>{if(by[loc]){by[loc].sort((a,b)=>a.n.localeCompare(b.n));out.push({loc,people:by[loc]});}});
   return out;
 }
 
-function buildDays(emp){
-  if(!emp) return [];
-  const days=[]; let iso=META.start;
-  while(iso<=META.end){
-    const wd=wdOf(iso);
-    const rec={date:iso,wd:WDa()[wd],wdFull:WDFa()[wd],dd:ddmm(iso)};
-    const r=(ROSTER[iso]||{})[emp];
-    if(r && r.s==='w'){
-      rec.status='work'; rec.shift={per:r.p,ini:r.i,fim:r.f,loc:r.l};
-      if(PREV[r.p]){
-        const [pp,poff,psay]=PREV[r.p], [np,noff,nsay]=NEXT[r.p];
-        rec.before={turno:pp,say:psay,groups:workersOn(addDays(iso,poff),pp)};
-        rec.same={groups:workersOn(iso,r.p,{exclude:emp,dropLoc:r.l})};
-        rec.after={turno:np,say:nsay,groups:workersOn(addDays(iso,noff),np)};
-      } else { rec.before=null; rec.same={groups:workersOn(iso,r.p,{exclude:emp,dropLoc:r.l})}; rec.after=null; }
-      if(r.l==='Desk -5'){
-        const d4=(rec.same.groups.find(g=>g.loc==='Desk -4'));
-        rec.desk4 = d4 ? {state:'covered',people:d4.people.map(p=>p.n)} : {state:'uncovered',people:[]};
-      } else rec.desk4=null;
-    } else if(r && r.s==='o'){ rec.status='off'; }
-    else if(r && r.s==='v'){ rec.status='vac'; }
-    else { rec.status='none'; }
-    days.push(rec); iso=addDays(iso,1);
+/* ---------- REGRA DAS 12 HORAS ---------- */
+function shiftIv(iso,ini,fim){
+  const s=new Date(iso+'T'+ini+':00');
+  let e=new Date(iso+'T'+fim+':00');
+  if(e<=s)e=new Date(e.getTime()+864e5);
+  return [s,e];
+}
+function restIssues(sched){
+  const list=[];
+  for(const d in sched){const r=sched[d];if(r&&r.s==='w'&&r.i&&r.f)list.push({date:d,per:r.p,iv:shiftIv(d,r.i,r.f)});}
+  list.sort((a,b)=>a.iv[0]-b.iv[0]);
+  const out=[];
+  for(let i=0;i<list.length-1;i++){
+    const gap=(list[i+1].iv[0]-list[i].iv[1])/36e5;
+    if(gap<MIN_REST) out.push({a:list[i],b:list[i+1],gap:Math.max(0,Math.round(gap*10)/10)});
   }
-  return days;
+  return out;
 }
-let DAYS = [];
-
-function accentFor(d){
-  if(d.status==='work') return PHEX[d.shift.per]||'#3f8bf6';
-  if(d.status==='off') return '#28c76f';
-  if(d.status==='vac') return '#f472b6';
-  return '#576273';
-}
-function idxForToday(){const t=todayISO();let i=DAYS.findIndex(d=>d.date===t);if(i>=0)return i;if(t<DAYS[0].date)return 0;return DAYS.length-1;}
-
-/* rail: buildRail cria (só ao trocar funcionario/init); markRail atualiza o dia selecionado sem recriar */
-function buildRail(){
-  const rail=document.getElementById('rail');rail.innerHTML='';const t=todayISO();
-  DAYS.forEach((d,i)=>{
-    const el=document.createElement('div');
-    el.className='pill'+(i===cur?' sel':'')+(d.date===t?' today':'');
-    el.style.color=accentFor(d);
-    el.innerHTML=`<div class="wd">${d.wd}</div><div class="dn">${d.date.slice(8)}</div><div class="dot" style="background:${accentFor(d)}"></div>`;
-    el.onclick=()=>{cur=i;tab='today';syncTabs();render();};
-    rail.appendChild(el);
+function fmtShift(x){return ddmm(x.date)+' '+tp(x.per);}
+/* valida a troca: A entrega dateA, B entrega dateB; eles trocam */
+function validateSwap(empA,dateA,empB,dateB){
+  const issues=[];
+  const rA=recOf(dateA,empA), rB=recOf(dateB,empB);
+  if(!rA||rA.s!=='w'||!rB||rB.s!=='w')return{ok:false,issues:[t('selShift')]};
+  if(empA===empB)return{ok:false,issues:['—']};
+  // conflito: ja tem turno no dia que vai receber
+  if(dateA!==dateB){
+    const cA=recOf(dateB,empA), cB=recOf(dateA,empB);
+    if(cA&&cA.s==='w')issues.push(t('conflict').replace('{n}',firstName(empA)).replace('{d}',ddmm(dateB)));
+    if(cB&&cB.s==='w')issues.push(t('conflict').replace('{n}',firstName(empB)).replace('{d}',ddmm(dateA)));
+  }
+  // escalas propostas
+  const sA=scheduleOf(empA), sB=scheduleOf(empB);
+  delete sA[dateA]; sA[dateB]=rB;
+  delete sB[dateB]; sB[dateA]=rA;
+  [[empA,sA],[empB,sB]].forEach(([nm,sc])=>{
+    restIssues(sc).forEach(x=>{
+      issues.push(firstName(nm)+': '+t('restBroken').replace('{h}',x.gap).replace('{a}',fmtShift(x.a)).replace('{b}',fmtShift(x.b)));
+    });
   });
-}
-function markRail(){
-  const rail=document.getElementById('rail');if(!rail.children.length){buildRail();return;}
-  [...rail.children].forEach((el,i)=>el.classList.toggle('sel',i===cur));
-}
-function scrollPill(i){const rail=document.getElementById('rail');const p=rail.children[i];if(!p)return;
-  const left=Math.max(0,p.offsetLeft-rail.clientWidth/2+p.clientWidth/2);
-  try{rail.scrollTo({left,behavior:'smooth'});}catch(e){rail.scrollLeft=left;}}
-function flashToday(){
-  const rail=document.getElementById('rail');const i=DAYS.findIndex(d=>d.date===todayISO());
-  if(i<0)return;const p=rail.children[i];if(!p)return;
-  p.classList.remove('flash');void p.offsetWidth;p.classList.add('flash');
-  setTimeout(()=>p.classList.remove('flash'),820);
-}
-function goToday(){
-  cur=idxForToday();tab='today';syncTabs();render();
-  scrollPill(cur);setTimeout(()=>{scrollPill(cur);flashToday();},60);
-  window.scrollTo({top:0,behavior:'smooth'});
+  return {ok:issues.length===0,issues};
 }
 
-function selectEmp(name){
-  selEmp=name;DAYS=buildDays(selEmp);cur=idxForToday();
-  document.getElementById('whoName').textContent=selEmp;
-  buildRail();closeOv();tab='today';syncTabs();render();
-  setTimeout(()=>scrollPill(cur),100);
+/* ---------- UI helpers ---------- */
+function accentOf(r){
+  if(!r)return 'var(--faint)';
+  if(r.s==='w')return PHEX[r.p]||'#3f8bf6';
+  if(r.s==='o')return 'var(--off)';
+  if(r.s==='v')return 'var(--vac)';
+  return 'var(--faint)';
+}
+function toast(title,txt,color){
+  const w=document.getElementById('toastWrap');
+  const el=document.createElement('div');el.className='toast';
+  if(color)el.style.borderLeftColor=color;
+  el.innerHTML=`<div class="tt">${title}</div><div class="tx">${txt}</div>`;
+  w.appendChild(el);setTimeout(()=>el.remove(),5200);
 }
 
-/* 24h clock */
-function hn(h){const[a,b]=h.split(':').map(Number);return a+b/60;}
-function clockHTML(s,isToday){
-  const a=hn(s.ini),b=hn(s.fim);let segs=b>a?[[a,b]]:[[a,24],[0,b]];
-  let inner=segs.map(([x,y])=>`<div class="seg" style="left:${x/24*100}%;width:${(y-x)/24*100}%"></div>`).join('');
-  if(isToday){const n=new Date();const h=n.getHours()+n.getMinutes()/60;inner+=`<div class="now" style="left:${h/24*100}%"></div>`;}
-  return `<div class="clock"><div class="track">${inner}</div><div class="ticks"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></div>`;
+/* ---------- sidebar ---------- */
+function renderEmps(term){
+  term=(term||'').toLowerCase();
+  const list=document.getElementById('emplist');
+  const items=EMPLOYEES.filter(n=>n.toLowerCase().includes(term));
+  list.innerHTML=items.map(n=>{
+    const sched=scheduleOf(n);
+    const cnt=Object.keys(sched).filter(d=>d>=META.start&&d<=META.end&&sched[d].s==='w').length;
+    return `<div class="eitem ${n===selEmp?'on':''}" data-n="${n}">
+      <span class="av">${initials(n)}</span><span class="nm">${n}</span><span class="mini">${cnt}</span></div>`;
+  }).join('');
+  list.querySelectorAll('.eitem').forEach(el=>el.onclick=()=>{selEmp=el.dataset.n;renderEmps(document.getElementById('q').value);render();});
 }
-function groupsHTML(groups,mineLoc){
-  if(!groups||!groups.length)return `<div class="empty">${t('nobody')}</div>`;
+
+/* ---------- view: grid ---------- */
+function renderGrid(){
+  const tdy=todayISO();
+  let head='<tr><th class="nameh">'+t('roster')+'</th>';
+  DATES.forEach(d=>{
+    const isT=d===tdy;
+    head+=`<th class="${isT?'tdy':(wdOf(d)===0||wdOf(d)===6?'wk':'')}">${WDS[lang][wdOf(d)]}<br>${d.slice(8)}</th>`;
+  });
+  head+='</tr>';
+  let body='';
+  EMPLOYEES.forEach(n=>{
+    body+=`<tr class="${n===selEmp?'selrow':''}"><td class="name" data-n="${n}">${n}</td>`;
+    DATES.forEach(d=>{
+      const r=recOf(d,n);
+      let cls='n',label='',bg='';
+      if(r&&r.s==='w'){cls='w';label=r.l.replace('Desk ','').replace('Bugibba','BUG').replace('Slots','SLT');bg=`background:${PHEX[r.p]}`;}
+      else if(r&&r.s==='o'){cls='o';label='·';}
+      else if(r&&r.s==='v'){cls='v';label='V';}
+      const sel=(n===selEmp&&d===selDate)?' selc':'';
+      body+=`<td class="cell${sel}" data-n="${n}" data-d="${d}"><div class="cellin ${cls}" style="${bg}">${label}</div></td>`;
+    });
+    body+='</tr>';
+  });
+  document.getElementById('content').innerHTML=
+    `<div class="gridwrap"><table class="grid"><thead>${head}</thead><tbody>${body}</tbody></table></div>
+     <div class="legend">
+       <span><i style="background:var(--morning)"></i>${t('morning')}</span>
+       <span><i style="background:var(--afternoon)"></i>${t('afternoon')}</span>
+       <span><i style="background:var(--night)"></i>${t('night')}</span>
+       <span><i style="box-shadow:inset 0 0 0 1px var(--line)"></i>${t('legOff')}</span>
+       <span><i style="background:var(--vac)"></i>${t('legVac')}</span>
+     </div>`;
+  document.querySelectorAll('td.cell').forEach(td=>td.onclick=()=>{
+    selEmp=td.dataset.n;selDate=td.dataset.d;view='day';syncTabs();renderEmps(document.getElementById('q').value);render();});
+  document.querySelectorAll('td.name').forEach(td=>td.onclick=()=>{
+    selEmp=td.dataset.n;renderEmps(document.getElementById('q').value);render();});
+  const tcol=document.querySelector('th.tdy');
+  if(tcol)tcol.scrollIntoView({inline:'center',block:'nearest'});
+}
+
+/* ---------- view: day ---------- */
+function groupsHTML(groups,mine){
+  if(!groups.length)return `<div class="empty">${t('nobody')}</div>`;
   return groups.map(g=>{
     const names=g.people.map(p=>p.n+(p.ot?`<span class="ot">${p.ot}</span>`:'')).join(', ');
-    const mine=g.loc===mineLoc?' mine':'';const tag=g.loc===mineLoc?g.loc+' ★':g.loc;
-    return `<div class="floor"><div class="fl${mine}">${tag}</div><div class="nm">${names}</div></div>`;
+    return `<div class="floor"><div class="fl${g.loc===mine?' mine':''}">${g.loc===mine?g.loc+' ★':g.loc}</div><div class="nm">${names}</div></div>`;
   }).join('');
 }
 function dayWorkHTML(iso){
-  const pers=['Manhã','Tarde','Noite'];let blocks='';let total=0;
-  for(const per of pers){
-    const groups=workersOn(iso,per);
-    if(!groups.length)continue;
-    total+=groups.reduce((a,g)=>a+g.people.length,0);
+  let blocks='',total=0;
+  ['Manhã','Tarde','Noite'].forEach(per=>{
+    const g=workersOn(iso,per);if(!g.length)return;
+    total+=g.reduce((a,x)=>a+x.people.length,0);
     const std=PADRAO[per];
-    blocks+=`<div class="block"><div class="lab"><span class="ic" style="background:${PCOL[per]}"></span><span class="t">${tp(per)}</span><span class="s">${std[0]}–${std[1]}</span></div>${groupsHTML(groups,null)}</div>`;
-  }
-  if(!total)return `<div class="daylabel">${t('nobodyDay')}</div>`;
-  return `<div class="daylabel">${t('whoWorks')} <span>${t('people',total)}</span></div><div class="blocks">${blocks}</div>`;
-}
-
-function welcomeHTML(){
-  return `<div class="welcome">
-    <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-    <h2>${t('welcomeH')}</h2><p>${t('welcomeP')}</p>
-    <button id="welcomeBtn">${t('welcomeB')}</button></div>`;
-}
-function renderToday(){
-  const v=document.getElementById('viewToday');
-  if(!selEmp||!DAYS.length){ v.innerHTML=welcomeHTML(); const wb=document.getElementById('welcomeBtn'); if(wb)wb.onclick=openOv; return; }
-  const d=DAYS[cur];const acc=accentFor(d);const isToday=d.date===todayISO();
-  const fn=firstName(selEmp);const hj=isToday?' · '+t('hojeWord'):'';let html='';
-  if(d.status==='work'){
-    const s=d.shift;
-    html+=`<section class="hero" style="--accent:${acc}"><div class="glow"></div>
-      <div class="datel"><span class="big">${d.wdFull}</span><span class="sub">${d.dd}${hj}</span></div>
-      <div class="tagrow"><span class="badge" style="background:${acc}">${tp(s.per)}</span>
-        <span class="loc">${s.loc}</span><span class="time"><b>${s.ini}</b>–<b>${s.fim}</b></span></div>
-      ${clockHTML(s,isToday)}</section>`;
-    if(d.desk4){
-      if(d.desk4.state==='uncovered') html+=`<div class="d4 bad"><span class="dt"></span><div><b>${t('d4bad')}</b> <span class="mono">${t('atTime')}</span></div></div>`;
-      else html+=`<div class="d4 ok"><span class="dt"></span><div><b>${t('d4ok')}</b> ${d.desk4.people.join(', ')} <span class="mono">${t('atTime')}</span></div></div>`;
-    }
-    html+=`<div class="blocks">`;
-    if(d.before) html+=`<div class="block"><div class="lab"><span class="ic" style="background:${PCOL[d.before.turno]}"></span><span class="t">${t('handTo',fn)}</span><span class="s">${tp(d.before.turno)} · ${d.before.say}</span></div>${groupsHTML(d.before.groups,s.loc)}</div>`;
-    html+=`<div class="block"><div class="lab"><span class="ic" style="background:${acc}"></span><span class="t">${t('sameTime')}</span><span class="s">${t('otherFloors')}</span></div>${groupsHTML(d.same.groups,null)}</div>`;
-    if(d.after) html+=`<div class="block"><div class="lab"><span class="ic" style="background:${PCOL[d.after.turno]}"></span><span class="t">${t('handFrom',fn)}</span><span class="s">${tp(d.after.turno)} · ${d.after.say}</span></div>${groupsHTML(d.after.groups,s.loc)}</div>`;
-    html+=`</div>`;
-  } else {
-    const k=d.status==='vac'?t('vac'):d.status==='off'?t('off'):t('noshift');
-    const msg=d.status==='vac'?t('restVac'):d.status==='off'?t('restOff'):'';
-    html+=`<section class="rest big" style="--accent:${acc};border-color:${acc}66"><div class="glow"></div><span class="k">${d.wdFull} · ${d.dd}${hj}</span><h2>${k}</h2><p>${msg}</p></section>`;
-    if(d.status==='off'||d.status==='vac') html+=dayWorkHTML(d.date);
-  }
-  html+=`<div class="nav"><button id="prev" ${cur===0?'disabled':''}>${t('prev')}</button><button id="next" ${cur===DAYS.length-1?'disabled':''}>${t('next')}</button></div>`;
-  v.innerHTML=html;
-  const pv=document.getElementById('prev'),nx=document.getElementById('next');
-  if(pv)pv.onclick=()=>{if(cur>0){cur--;render();scrollPill(cur);}};
-  if(nx)nx.onclick=()=>{if(cur<DAYS.length-1){cur++;render();scrollPill(cur);}};
-}
-
-/* agenda + filters */
-function chip(group,val,label){return `<div class="fchip ${filter[group]===val?'on':''}" data-g="${group}" data-v="${val}">${label}</div>`;}
-function passFilter(d){
-  if(filter.tipo==='work' && d.status!=='work') return false;
-  if(filter.tipo==='off' && d.status!=='off') return false;
-  if(filter.tipo==='vac' && d.status!=='vac') return false;
-  if(filter.turno!=='all'){ if(d.status!=='work'||d.shift.per!==filter.turno) return false; }
-  if(filter.site!=='all'){ if(d.status!=='work'||d.shift.loc!==filter.site) return false; }
-  return true;
-}
-function renderAgenda(){
-  const v=document.getElementById('viewAgenda');
-  if(!selEmp||!DAYS.length){ v.innerHTML=welcomeHTML(); const wb=document.getElementById('welcomeBtn'); if(wb)wb.onclick=openOv; return; }
-  const showTurnoSite = !(filter.tipo==='off'||filter.tipo==='vac');
-  let fh=`<div class="filters">
-    <div class="fgroup">${chip('tipo','all',t('fAll'))}${chip('tipo','work',t('fWork'))}${chip('tipo','off',t('off'))}${chip('tipo','vac',t('vac'))}</div>`;
-  if(showTurnoSite){
-    fh+=`<div class="fgroup">${chip('turno','all',t('fTurno'))}${chip('turno','Manhã',tp('Manhã'))}${chip('turno','Tarde',tp('Tarde'))}${chip('turno','Noite',tp('Noite'))}</div>
-    <div class="fgroup">${chip('site','all',t('fSite'))}${SITES.map(s=>chip('site',s,s.replace('Desk ',''))).join('')}</div>`;
-  }
-  fh+=`</div>`;
-
-  const filtered=DAYS.filter(passFilter);
-  const active = !(filter.tipo==='all'&&filter.turno==='all'&&filter.site==='all');
-  let body='';
-  if(!filtered.length){ body=`<div class="count">${t('noFilter')}</div>`; }
-  else if(active){
-    body=`<div class="count">${t('daysN',filtered.length)}</div>`;
-    filtered.forEach(d=>body+=arow(d));
-  } else {
-    let weeks=[],w=[];
-    DAYS.forEach(d=>{const wd=wdOf(d.date);if(w.length&&wd===1){weeks.push(w);w=[];}w.push(d);});
-    if(w.length)weeks.push(w);
-    weeks.forEach(wk=>{
-      const nw=wk.filter(x=>x.status==='work').length,no=wk.filter(x=>x.status==='off').length,nv=wk.filter(x=>x.status==='vac').length;
-      const c=`${nw} ${t('wTrab')} · ${no} ${t('wFolga')}`+(nv?` · ${nv} ${t('wFer')}`:'');
-      body+=`<div class="week"><div class="wh"><span class="r">${wk[0].dd} › ${wk[wk.length-1].dd}</span><span class="c">${c}</span></div>`;
-      wk.forEach(d=>body+=arow(d));
-      body+='</div>';
-    });
-  }
-  body+=`<div class="foot">${t('footer')}<br>${META.start.split('-').reverse().join('/')} › ${META.end.split('-').reverse().join('/')}</div>`;
-  v.innerHTML=fh+body;
-  v.querySelectorAll('.fchip').forEach(c=>c.onclick=()=>{
-    const g=c.dataset.g,val=c.dataset.v; filter[g]=val;
-    if(g==='tipo'&&(val==='off'||val==='vac')){filter.turno='all';filter.site='all';}
-    renderAgenda();
+    blocks+=`<div class="block"><div class="lab"><span class="ic" style="background:${PCOL[per]}"></span><span class="t">${tp(per)}</span><span class="s">${std[0]}–${std[1]}</span></div>${groupsHTML(g,null)}</div>`;
   });
-  v.querySelectorAll('.arow').forEach(el=>el.onclick=()=>{cur=parseInt(el.dataset.i);tab='today';syncTabs();render();scrollPill(cur);window.scrollTo({top:0,behavior:'smooth'});});
+  if(!total)return '';
+  return `<div class="daylabel">${t('whoWorks')}<span>${t('people',total)}</span></div><div class="cols3">${blocks}</div>`;
 }
-function arow(d){
-  const acc=accentFor(d);const gi=DAYS.indexOf(d);let txt,rt='';
-  if(d.status==='work'){txt=tp(d.shift.per);rt=`${d.shift.loc} · ${d.shift.ini}–${d.shift.fim}`;}
-  else if(d.status==='off')txt=t('off');else if(d.status==='vac')txt=t('vac');else txt=t('noshift');
-  return `<div class="arow" data-i="${gi}"><span class="day">${d.wd} <b>${d.date.slice(8)}</b></span>
-    <span class="bar" style="background:${acc}"></span>
-    <span class="txt" style="color:${d.status==='work'?acc:'var(--text)'}">${txt}</span><span class="rt">${rt}</span></div>`;
+function renderDay(){
+  const c=document.getElementById('content');
+  if(!selEmp){c.innerHTML=`<div class="emptybox"><h3>${t('employee')}</h3><p>${t('selCol')}</p></div>`;return;}
+  if(!selDate)selDate=DATES.includes(todayISO())?todayISO():DATES[0];
+  const r=recOf(selDate,selEmp), acc=accentOf(r), isT=selDate===todayISO();
+  let h=`<div class="dayhead"><h2>${WDF[lang][wdOf(selDate)]}</h2><span class="sub">${ddmm(selDate)}${isT?' · '+t('today'):''} · ${selEmp}</span>`;
+  if(r&&r.s==='w')h+=`<div class="swapcta"><button class="btn primary" id="goSwap">${t('reqSwap')}</button></div>`;
+  h+=`</div>`;
+  if(r&&r.s==='w'){
+    const a=parseFloat(r.i.split(':')[0])+parseFloat(r.i.split(':')[1])/60;
+    const b=parseFloat(r.f.split(':')[0])+parseFloat(r.f.split(':')[1])/60;
+    const segs=b>a?[[a,b]]:[[a,24],[0,b]];
+    let inner=segs.map(([x,y])=>`<div class="seg" style="left:${x/24*100}%;width:${(y-x)/24*100}%"></div>`).join('');
+    if(isT){const n=new Date();inner+=`<div class="now" style="left:${(n.getHours()+n.getMinutes()/60)/24*100}%"></div>`;}
+    h+=`<div class="hero" style="--accent:${acc}"><div class="glow"></div>
+      <div class="tagrow"><span class="badge" style="background:${acc}">${tp(r.p)}</span>
+      <span class="loc">${r.l}</span><span class="time"><b>${r.i}</b>–<b>${r.f}</b></span></div>
+      <div class="clock"><div class="track">${inner}</div>
+      <div class="ticks"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></div></div>`;
+    if(r.l==='Desk -5'){
+      const same=workersOn(selDate,r.p,{exclude:selEmp,dropLoc:r.l});
+      const d4=same.find(g=>g.loc==='Desk -4');
+      h+=d4?`<div class="d4 ok"><span class="dt"></span><div><b>${t('d4ok')}</b> ${d4.people.map(p=>p.n).join(', ')}</div></div>`
+           :`<div class="d4 bad"><span class="dt"></span><div><b>${t('d4bad')}</b> ${t('atTime')}</div></div>`;
+    }
+    const [pp,po]=PREV[r.p]||[], [np,no]=NEXT[r.p]||[];
+    h+=`<div class="cols3">`;
+    if(pp)h+=`<div class="block"><div class="lab"><span class="ic" style="background:${PCOL[pp]}"></span><span class="t">${t('handTo')} ${firstName(selEmp)}</span><span class="s">${tp(pp)}</span></div>${groupsHTML(workersOn(addDays(selDate,po),pp),r.l)}</div>`;
+    h+=`<div class="block"><div class="lab"><span class="ic" style="background:${acc}"></span><span class="t">${t('sameTime')}</span><span class="s">${t('otherFloors')}</span></div>${groupsHTML(workersOn(selDate,r.p,{exclude:selEmp,dropLoc:r.l}),null)}</div>`;
+    if(np)h+=`<div class="block"><div class="lab"><span class="ic" style="background:${PCOL[np]}"></span><span class="t">${firstName(selEmp)} ${t('handFrom')}</span><span class="s">${tp(np)}</span></div>${groupsHTML(workersOn(addDays(selDate,no),np),r.l)}</div>`;
+    h+=`</div>`;
+  } else {
+    const k=r&&r.s==='v'?t('vac'):r&&r.s==='o'?t('off'):t('noshift');
+    h+=`<div class="rest" style="--accent:${acc}"><div class="glow"></div><div class="k">${ddmm(selDate)}</div><h2>${k}</h2></div>`;
+    h+=dayWorkHTML(selDate);
+  }
+  c.innerHTML=h;
+  const gs=document.getElementById('goSwap');
+  if(gs)gs.onclick=()=>{view='swap';swapForm.dateA=selDate;syncTabs();render();};
 }
 
-/* search overlay */
-function initials(n){const p=n.split(' ');return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
-function openOv(){
-  const ov=document.getElementById('ov');ov.hidden=false;
-  const q=document.getElementById('q');q.value='';renderList('');setTimeout(()=>q.focus(),50);
+/* ---------- view: swaps ---------- */
+let swapForm={dateA:null,empB:null,dateB:null,msg:''};
+function myWorkDays(emp){return DATES.filter(d=>{const r=recOf(d,emp);return r&&r.s==='w';});}
+function renderSwap(){
+  const c=document.getElementById('content');
+  if(!selEmp){c.innerHTML=`<div class="emptybox"><h3>${t('employee')}</h3><p>${t('selCol')}</p></div>`;return;}
+  const mine=myWorkDays(selEmp);
+  if(!swapForm.dateA||!mine.includes(swapForm.dateA))swapForm.dateA=mine[0]||null;
+  const theirs=swapForm.empB?myWorkDays(swapForm.empB):[];
+  if(swapForm.dateB&&!theirs.includes(swapForm.dateB))swapForm.dateB=null;
+
+  const rA=swapForm.dateA?recOf(swapForm.dateA,selEmp):null;
+  const rB=(swapForm.empB&&swapForm.dateB)?recOf(swapForm.dateB,swapForm.empB):null;
+  let val=null;
+  if(rA&&rB)val=validateSwap(selEmp,swapForm.dateA,swapForm.empB,swapForm.dateB);
+
+  let form=`<div class="card"><h3>${t('newReq')}</h3><div class="hint">${t('newReqHint')}</div>
+    <div class="field"><label>${t('yourShift')}</label><div class="pickday" id="pickA">`;
+  mine.forEach(d=>{const r=recOf(d,selEmp);
+    form+=`<button data-d="${d}" class="${d===swapForm.dateA?'on':''}" style="${d===swapForm.dateA?'background:'+PHEX[r.p]:''}">${ddmm(d)} ${tp(r.p).slice(0,3)}</button>`;});
+  form+=`</div></div>
+    <div class="field"><label>${t('colleague')}</label><select id="selB"><option value="">${t('selCol')}</option>`;
+  EMPLOYEES.filter(n=>n!==selEmp&&myWorkDays(n).length).forEach(n=>{
+    form+=`<option value="${n}" ${n===swapForm.empB?'selected':''}>${n}</option>`;});
+  form+=`</select></div>`;
+  if(swapForm.empB){
+    form+=`<div class="field"><label>${t('theirShift')}</label><div class="pickday" id="pickB">`;
+    theirs.forEach(d=>{const r=recOf(d,swapForm.empB);
+      form+=`<button data-d="${d}" class="${d===swapForm.dateB?'on':''}" style="${d===swapForm.dateB?'background:'+PHEX[r.p]:''}">${ddmm(d)} ${tp(r.p).slice(0,3)}</button>`;});
+    form+=`</div></div>`;
+  }
+  if(val){
+    form+=val.ok?`<div class="vbox ok"><b>✓ ${t('validOk')}</b><div class="li">${t('validOkTx')}</div></div>`
+      :`<div class="vbox bad"><b>✕ ${t('validBad')}</b><div class="li">${t('validBadTx')}</div>`+
+        val.issues.map(i=>`<div class="li">· ${i}</div>`).join('')+`</div>`;
+  }
+  form+=`<div class="field"><label>${t('msgToCol')}</label><textarea id="msgA" placeholder="${t('msgPh')}">${swapForm.msg||''}</textarea></div>
+    <button class="btn primary" id="submitReq" ${(val&&val.ok)?'':'disabled'} style="width:100%">${t('submit')}</button></div>`;
+
+  const visible=REQUESTS.filter(r=>role==='controller'||r.a===selEmp||r.b===selEmp);
+  let list='';
+  if(!visible.length){
+    list=`<div class="emptybox"><h3>${role==='controller'?t('noReqCtl'):t('noReq')}</h3><p>${role==='controller'?t('noReqCtlTx'):t('noReqTx')}</p></div>`;
+  } else {
+    list='<div class="reqlist">'+visible.slice().reverse().map(r=>reqHTML(r)).join('')+'</div>';
+  }
+  c.innerHTML=`<div class="swapgrid">${form}<div>${list}</div></div>`;
+
+  document.querySelectorAll('#pickA button').forEach(b=>b.onclick=()=>{swapForm.dateA=b.dataset.d;renderSwap();});
+  document.querySelectorAll('#pickB button').forEach(b=>b.onclick=()=>{swapForm.dateB=b.dataset.d;renderSwap();});
+  const sb=document.getElementById('selB');
+  if(sb)sb.onchange=()=>{swapForm.empB=sb.value||null;swapForm.dateB=null;renderSwap();};
+  const ma=document.getElementById('msgA');
+  if(ma)ma.oninput=()=>{swapForm.msg=ma.value;};
+  const su=document.getElementById('submitReq');
+  if(su)su.onclick=submitRequest;
+  bindReqEvents();
 }
-function closeOv(){document.getElementById('ov').hidden=true;}
-function renderList(term){
-  term=term.toLowerCase();
-  const list=document.getElementById('slist');
-  const items=EMPLOYEES.filter(n=>n.toLowerCase().includes(term));
-  list.innerHTML = items.length? items.map(n=>`<div class="sitem ${n===selEmp?'cur':''}" data-n="${n}">
-      <span class="av">${initials(n)}</span><span class="nm">${n}</span>${n===selEmp?`<span class="tag">${t('current')}</span>`:''}</div>`).join('')
-    : `<div class="count" style="padding:16px">${t('notFound')}</div>`;
-  list.querySelectorAll('.sitem').forEach(el=>el.onclick=()=>selectEmp(el.dataset.n));
+function reqHTML(r){
+  const rA=r.shiftA, rB=r.shiftB;
+  return `<div class="req" data-id="${r.id}">
+    <div class="rh"><span class="st ${r.status}">${t(r.status)}</span>
+      <span style="font-family:var(--display);font-weight:600;font-size:13px">${t('reqBy')} ${firstName(r.a)}</span>
+      <span class="rid">#${String(r.id).padStart(3,'0')}</span></div>
+    <div class="swapviz">
+      <div class="leg"><div class="who">${r.a}</div>
+        <div class="det"><span class="pill2" style="background:${PHEX[rA.p]}">${tp(rA.p)}</span>${ddmm(r.dateA)}<br>${rA.i}–${rA.f} · ${rA.l}</div></div>
+      <div class="arrows">⇄</div>
+      <div class="leg"><div class="who">${r.b}</div>
+        <div class="det"><span class="pill2" style="background:${PHEX[rB.p]}">${tp(rB.p)}</span>${ddmm(r.dateB)}<br>${rB.i}–${rB.f} · ${rB.l}</div></div>
+    </div>
+    <div class="chat">
+      <div class="msgs">${r.msgs.map(m=>m.sys
+        ?`<div class="msg sys">— ${m.txt} —</div>`
+        :`<div class="msg ${m.au===selEmp?'me':''}"><span class="au">${m.au}</span>${m.txt}</div>`).join('')}</div>
+      <div class="chatin"><input type="text" placeholder="${t('sendPh')}" data-chat="${r.id}"><button class="btn sm" data-send="${r.id}">${t('send')}</button></div>
+    </div>
+    ${r.status==='pending'?`<div class="acts">
+      ${role==='controller'
+        ?`<button class="btn ok sm" data-ap="${r.id}">${t('approve')}</button><button class="btn danger sm" data-rj="${r.id}">${t('reject')}</button>`
+        :`<span class="note">${t('onlyCtl')}</span>`}</div>`
+     :r.status==='approved'?`<div class="acts"><button class="btn sm" data-mail="${r.id}">✉ ${t('emailBtn')}</button></div>`:''}
+  </div>`;
+}
+function bindReqEvents(){
+  document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>decide(+b.dataset.ap,true));
+  document.querySelectorAll('[data-rj]').forEach(b=>b.onclick=()=>decide(+b.dataset.rj,false));
+  document.querySelectorAll('[data-send]').forEach(b=>b.onclick=()=>{
+    const id=+b.dataset.send;const inp=document.querySelector(`[data-chat="${id}"]`);
+    if(inp&&inp.value.trim()){
+      REQUESTS.find(r=>r.id===id).msgs.push({au:role==='controller'?t('controller'):selEmp,txt:inp.value.trim()});
+      renderSwap();
+    }});
+  document.querySelectorAll('[data-chat]').forEach(inp=>inp.onkeydown=(e)=>{
+    if(e.key==='Enter'){const id=+inp.dataset.chat;
+      if(inp.value.trim()){REQUESTS.find(r=>r.id===id).msgs.push({au:role==='controller'?t('controller'):selEmp,txt:inp.value.trim()});renderSwap();}}});
+  document.querySelectorAll('[data-mail]').forEach(b=>b.onclick=()=>sendMail(+b.dataset.mail));
+}
+function submitRequest(){
+  const v=validateSwap(selEmp,swapForm.dateA,swapForm.empB,swapForm.dateB);
+  if(!v.ok)return;
+  const r={id:reqSeq++,a:selEmp,b:swapForm.empB,dateA:swapForm.dateA,dateB:swapForm.dateB,
+    shiftA:recOf(swapForm.dateA,selEmp),shiftB:recOf(swapForm.dateB,swapForm.empB),
+    status:'pending',msgs:[{sys:true,txt:t('sysCreated')}]};
+  if(swapForm.msg&&swapForm.msg.trim())r.msgs.push({au:selEmp,txt:swapForm.msg.trim()});
+  REQUESTS.push(r);
+  swapForm={dateA:null,empB:null,dateB:null,msg:''};
+  toast(t('pending'),`#${String(r.id).padStart(3,'0')} · ${firstName(r.a)} ⇄ ${firstName(r.b)}`,'var(--warn)');
+  syncTabs();renderSwap();
+}
+function decide(id,ok){
+  const r=REQUESTS.find(x=>x.id===id);if(!r||r.status!=='pending')return;
+  if(ok){
+    const v=validateSwap(r.a,r.dateA,r.b,r.dateB);
+    if(!v.ok){toast(t('validBad'),v.issues[0],'var(--alert)');return;}
+    // aplica na escala
+    if(r.dateA===r.dateB){
+      OVERRIDES[r.dateA+'|'+r.a]={...r.shiftB};
+      OVERRIDES[r.dateA+'|'+r.b]={...r.shiftA};
+    } else {
+      OVERRIDES[r.dateA+'|'+r.a]={s:'o'};   // A deixa de trabalhar no dia dele
+      OVERRIDES[r.dateB+'|'+r.a]={...r.shiftB}; // e assume o turno de B
+      OVERRIDES[r.dateB+'|'+r.b]={s:'o'};   // B deixa de trabalhar no dia dele
+      OVERRIDES[r.dateA+'|'+r.b]={...r.shiftA}; // e assume o turno de A
+    }
+    r.status='approved';r.msgs.push({sys:true,txt:t('sysApproved')});
+    toast('✓ '+t('apprd'),t('apprdTx').replace('{a}',firstName(r.a)).replace('{b}',firstName(r.b)),'var(--off)');
+  } else {
+    r.status='rejected';r.msgs.push({sys:true,txt:t('sysRejected')});
+    toast(t('rejd'),t('rejdTx').replace('{a}',firstName(r.a)).replace('{b}',firstName(r.b)),'var(--alert)');
+  }
+  renderEmps(document.getElementById('q').value);
+  syncTabs();renderSwap();
+}
+function sendMail(id){
+  const r=REQUESTS.find(x=>x.id===id);if(!r)return;
+  const sub=`Shift swap #${String(r.id).padStart(3,'0')} approved — ${firstName(r.a)} / ${firstName(r.b)}`;
+  const body=
+`Shift swap request #${String(r.id).padStart(3,'0')} has been APPROVED.
+
+${r.a}
+  ${t('gives')}: ${ddmm(r.dateA)} ${tp(r.shiftA.p)} ${r.shiftA.i}-${r.shiftA.f} @ ${r.shiftA.l}
+  ${t('gets')}:  ${ddmm(r.dateB)} ${tp(r.shiftB.p)} ${r.shiftB.i}-${r.shiftB.f} @ ${r.shiftB.l}
+
+${r.b}
+  ${t('gives')}: ${ddmm(r.dateB)} ${tp(r.shiftB.p)} ${r.shiftB.i}-${r.shiftB.f} @ ${r.shiftB.l}
+  ${t('gets')}:  ${ddmm(r.dateA)} ${tp(r.shiftA.p)} ${r.shiftA.i}-${r.shiftA.f} @ ${r.shiftA.l}
+
+Minimum rest of ${MIN_REST}h between shifts was verified for both employees.
+The roster has been updated.`;
+  window.location.href='mailto:?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body);
 }
 
+/* ---------- chrome ---------- */
 function syncTabs(){
-  document.querySelectorAll('.tab').forEach(tb=>tb.classList.toggle('on',tb.dataset.tab===tab));
-  document.getElementById('viewToday').hidden=tab!=='today';
-  document.getElementById('viewAgenda').hidden=tab!=='agenda';
+  document.querySelectorAll('.vtabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
+  const pend=REQUESTS.filter(r=>r.status==='pending'&&(role==='controller'||r.a===selEmp||r.b===selEmp)).length;
+  document.getElementById('tabSwap').innerHTML=t('swaps')+(pend?`<span class="badge2">${pend}</span>`:'');
 }
-function render(){
-  markRail();
-  if(tab==='today')renderToday();else renderAgenda();
-  document.getElementById('todayBtn').classList.toggle('on',!!selEmp&&DAYS[cur]&&DAYS[cur].date===todayISO());
-}
-
-/* textos estaticos por idioma */
 function applyStatic(){
   document.getElementById('appTitle').textContent=t('title');
   document.getElementById('kicker').textContent=t('kicker');
-  document.getElementById('todayBtn').textContent=t('today');
-  document.getElementById('funcLabel').textContent=t('funcLabel');
-  document.getElementById('chgLabel').textContent=t('change');
-  document.getElementById('whoName').textContent=selEmp||t('select');
-  document.getElementById('tabToday').textContent=t('today');
-  document.getElementById('tabAgenda').textContent=t('agenda');
   document.getElementById('q').placeholder=t('searchPh');
-  document.getElementById('closeOv').textContent=t('close');
+  document.getElementById('roleLabel').textContent=t('access');
+  document.getElementById('roleEmp').textContent=t('employee');
+  document.getElementById('roleCtl').textContent=t('controller');
+  document.getElementById('todayBtn').textContent=t('today');
+  document.getElementById('tabGrid').textContent=t('roster');
+  document.getElementById('tabDay').textContent=t('day');
   document.getElementById('langBtn').textContent=flagOf(lang);
   document.documentElement.lang=lang;
 }
-function setLang(l){ lang=l; if(selEmp)DAYS=buildDays(selEmp); applyStatic(); buildRail(); render(); }
-
-function themeIcon(){
-  return theme==='dark'
-    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>'
-    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+function render(){
+  syncTabs();
+  if(view==='grid')renderGrid();
+  else if(view==='day')renderDay();
+  else renderSwap();
 }
-function toggleTheme(){ theme=theme==='dark'?'light':'dark'; document.documentElement.dataset.theme=theme; document.getElementById('themeBtn').innerHTML=themeIcon(); }
-function openLangMenu(){
-  const m=document.getElementById('langMenu');
-  m.innerHTML=LANGS.map(([code,label,flag])=>`<div class="${code===lang?'on':''}" data-l="${code}"><span class="fl">${flag}</span>${label}</div>`).join('');
-  m.hidden=false;
-  const r=document.getElementById('langBtn').getBoundingClientRect();
-  m.style.top=(r.bottom+6)+'px'; m.style.right=(window.innerWidth-r.right)+'px';
-  m.querySelectorAll('div').forEach(el=>el.onclick=()=>{setLang(el.dataset.l);m.hidden=true;});
-}
+function themeIcon(){return theme==='dark'
+  ?'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>'
+  :'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';}
 
-document.querySelectorAll('.tab').forEach(tb=>tb.onclick=()=>{tab=tb.dataset.tab;syncTabs();render();});
-document.getElementById('todayBtn').onclick=goToday;
-document.getElementById('empBtn').onclick=openOv;
-document.getElementById('closeOv').onclick=closeOv;
-document.getElementById('ov').onclick=(e)=>{if(e.target.id==='ov')closeOv();};
-document.getElementById('q').oninput=(e)=>renderList(e.target.value);
-document.getElementById('themeBtn').onclick=toggleTheme;
-document.getElementById('langBtn').onclick=(e)=>{e.stopPropagation();const m=document.getElementById('langMenu');if(m.hidden)openLangMenu();else m.hidden=true;};
-document.addEventListener('click',(e)=>{const m=document.getElementById('langMenu');if(!m.hidden&&e.target.id!=='langBtn')m.hidden=true;});
+document.querySelectorAll('.vtabs button').forEach(b=>b.onclick=()=>{view=b.dataset.v;render();});
+document.getElementById('q').oninput=e=>renderEmps(e.target.value);
+document.getElementById('roleEmp').onclick=()=>{role='employee';document.getElementById('roleEmp').classList.add('on');document.getElementById('roleCtl').classList.remove('on');render();};
+document.getElementById('roleCtl').onclick=()=>{role='controller';document.getElementById('roleCtl').classList.add('on');document.getElementById('roleEmp').classList.remove('on');render();};
+document.getElementById('todayBtn').onclick=()=>{if(DATES.includes(todayISO()))selDate=todayISO();view=view==='swap'?'day':view;render();};
+document.getElementById('themeBtn').onclick=()=>{theme=theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;document.getElementById('themeBtn').innerHTML=themeIcon();};
+document.getElementById('langBtn').onclick=e=>{e.stopPropagation();const m=document.getElementById('langMenu');
+  if(!m.hidden){m.hidden=true;return;}
+  m.innerHTML=LANGS.map(([c,l,f])=>`<div class="${c===lang?'on':''}" data-l="${c}"><span class="fl">${f}</span>${l}</div>`).join('');
+  m.hidden=false;const r=e.target.getBoundingClientRect();m.style.top=(r.bottom+6)+'px';m.style.right=(window.innerWidth-r.right)+'px';
+  m.querySelectorAll('div').forEach(d=>d.onclick=()=>{lang=d.dataset.l;m.hidden=true;applyStatic();render();});};
+document.addEventListener('click',e=>{const m=document.getElementById('langMenu');if(!m.hidden&&e.target.id!=='langBtn')m.hidden=true;});
 
 document.documentElement.dataset.theme=theme;
 document.getElementById('themeBtn').innerHTML=themeIcon();
-applyStatic();
-buildRail();
-syncTabs();render();
-
+selDate=DATES.includes(todayISO())?todayISO():DATES[0];
+applyStatic();renderEmps('');render();
 </script>
 </body>
 </html>
